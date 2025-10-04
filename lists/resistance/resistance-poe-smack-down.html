@@ -83,7 +83,7 @@ h1 { font-size: 1.5rem; }
 }
 table { 
   border-collapse: collapse; 
-  table-layout: fixed; 
+  table-layout: auto; 
   width: max-content;
   min-width: 100%;
 }
@@ -481,17 +481,81 @@ function navigateFocus(direction) {
   // Store the direction for auto-skip logic
   showGameStepAndUnit._lastDirection = direction;
   
+  // Check if current game step is engagement phase
+  const currentGameStep = allGameSteps[currentGameStepIndex];
+  const isCurrentEngagementPhase = currentGameStep && currentGameStep.startsWith('engagement_phase-');
+  
   if (direction === 'next') {
-    currentUnitIndex++;
-    if (currentUnitIndex >= allUnitClasses.length) {
-      currentUnitIndex = 0;
-      currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+    if (isCurrentEngagementPhase) {
+      // In engagement phase: navigate units in reverse order (last to first)
+      currentUnitIndex--;
+      if (currentUnitIndex < 0) {
+        // Move to next step
+        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+        const nextGameStep = allGameSteps[currentGameStepIndex];
+        const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+        
+        if (isNextEngagementPhase) {
+          // Next step is also engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        } else {
+          // Next step is not engagement phase: start from first unit
+          currentUnitIndex = 0;
+        }
+      }
+    } else {
+      // Not in engagement phase: navigate units in normal order (first to last)
+      currentUnitIndex++;
+      if (currentUnitIndex >= allUnitClasses.length) {
+        // Move to next step
+        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+        const nextGameStep = allGameSteps[currentGameStepIndex];
+        const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+        
+        if (isNextEngagementPhase) {
+          // Next step is engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        } else {
+          // Next step is not engagement phase: start from first unit
+          currentUnitIndex = 0;
+        }
+      }
     }
   } else if (direction === 'prev') {
-    currentUnitIndex--;
-    if (currentUnitIndex < 0) {
-      currentUnitIndex = allUnitClasses.length - 1;
-      currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+    if (isCurrentEngagementPhase) {
+      // In engagement phase: navigate units in reverse order (when going backwards, go from first to last)
+      currentUnitIndex++;
+      if (currentUnitIndex >= allUnitClasses.length) {
+        // Move to previous step
+        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+        const prevGameStep = allGameSteps[currentGameStepIndex];
+        const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+        
+        if (isPrevEngagementPhase) {
+          // Previous step is also engagement phase: start from first unit
+          currentUnitIndex = 0;
+        } else {
+          // Previous step is not engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        }
+      }
+    } else {
+      // Not in engagement phase: navigate units in normal order (when going backwards, go from last to first)
+      currentUnitIndex--;
+      if (currentUnitIndex < 0) {
+        // Move to previous step
+        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+        const prevGameStep = allGameSteps[currentGameStepIndex];
+        const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+        
+        if (isPrevEngagementPhase) {
+          // Previous step is engagement phase: start from first unit
+          currentUnitIndex = 0;
+        } else {
+          // Previous step is not engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        }
+      }
     }
   }
   
@@ -569,18 +633,81 @@ function autoSkipToNextContent(direction) {
   while (attempts < maxAttempts) {
     attempts++;
     
-    // Move to next/previous combination
+    // Use the same navigation logic as navigateFocus to respect engagement phase rules
+    const currentGameStep = allGameSteps[currentGameStepIndex];
+    const isCurrentEngagementPhase = currentGameStep && currentGameStep.startsWith('engagement_phase-');
+    
     if (direction === 'next') {
-      currentUnitIndex++;
-      if (currentUnitIndex >= allUnitClasses.length) {
-        currentUnitIndex = 0;
-        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+      if (isCurrentEngagementPhase) {
+        // In engagement phase: navigate units in reverse order (last to first)
+        currentUnitIndex--;
+        if (currentUnitIndex < 0) {
+          // Move to next step
+          currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+          const nextGameStep = allGameSteps[currentGameStepIndex];
+          const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+          
+          if (isNextEngagementPhase) {
+            // Next step is also engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          } else {
+            // Next step is not engagement phase: start from first unit
+            currentUnitIndex = 0;
+          }
+        }
+      } else {
+        // Not in engagement phase: navigate units in normal order (first to last)
+        currentUnitIndex++;
+        if (currentUnitIndex >= allUnitClasses.length) {
+          // Move to next step
+          currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+          const nextGameStep = allGameSteps[currentGameStepIndex];
+          const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+          
+          if (isNextEngagementPhase) {
+            // Next step is engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          } else {
+            // Next step is not engagement phase: start from first unit
+            currentUnitIndex = 0;
+          }
+        }
       }
     } else if (direction === 'prev') {
-      currentUnitIndex--;
-      if (currentUnitIndex < 0) {
-        currentUnitIndex = allUnitClasses.length - 1;
-        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+      if (isCurrentEngagementPhase) {
+        // In engagement phase: navigate units in reverse order (when going backwards, go from first to last)
+        currentUnitIndex++;
+        if (currentUnitIndex >= allUnitClasses.length) {
+          // Move to previous step
+          currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+          const prevGameStep = allGameSteps[currentGameStepIndex];
+          const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+          
+          if (isPrevEngagementPhase) {
+            // Previous step is also engagement phase: start from first unit
+            currentUnitIndex = 0;
+          } else {
+            // Previous step is not engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          }
+        }
+      } else {
+        // Not in engagement phase: navigate units in normal order (when going backwards, go from last to first)
+        currentUnitIndex--;
+        if (currentUnitIndex < 0) {
+          // Move to previous step
+          currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+          const prevGameStep = allGameSteps[currentGameStepIndex];
+          const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+          
+          if (isPrevEngagementPhase) {
+            // Previous step is engagement phase: start from first unit
+            currentUnitIndex = 0;
+          } else {
+            // Previous step is not engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          }
+        }
       }
     }
     
