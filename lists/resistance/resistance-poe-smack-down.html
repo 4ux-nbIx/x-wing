@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Poe Smack Down</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xwing-miniatures-font/dist/xwing-miniatures.css" />
+<style>
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 1rem; 
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  body { margin: 0.5rem; }
+  h1 { font-size: 1.3rem; }
+  th, td { font-size: 12px; padding: 3px 4px; }
+  
+  /* Focus view mobile fixes */
+  #focusedContainer {
+    height: calc(100vh - 50px) !important;
+    padding: 5px 5px 0 5px !important;
+    padding-bottom: 60px !important;
+    width: 100vw !important;
+    overflow: auto !important;
+  }
+  
+  #focusedContainer .content-wrapper {
+    max-width: calc(100vw - 10px) !important;
+    width: 100% !important;
+  }
+  
+  #focusedContainer .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+  }
+  
+  #focusedContainer table {
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+  
+  #focusedContainer table th:not(.step-col),
+  #focusedContainer table td:not(.event-label) {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+  }
+  
+  #focusedView .focus-nav-controls {
+    width: 100vw !important;
+    left: 0 !important;
+    transform: none !important;
+    height: 50px !important;
+    padding: 5px 10px !important;
+    min-width: unset !important;
+    box-sizing: border-box !important;
+  }
+  
+  #focusedView .focus-nav-controls button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    font-size: 16px !important;
+    padding: 4px 8px !important;
+  }
+  
+  #focusedView .focus-nav-controls #focusInfo {
+    font-size: 10px !important;
+    padding: 0 8px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+  }
+}
+h1 { font-size: 1.5rem; }
+.table-container { 
+  width: 100%; 
+}
+table { 
+  border-collapse: collapse; 
+  table-layout: fixed; 
+  width: max-content;
+  min-width: 100%;
+}
+th, td { 
+  border: 1px solid #999; 
+  padding: 4px 6px; 
+  vertical-align: top; 
+  font-size: 13px;
+  height: auto;
+}
+th { background: #eee; }
+th.step-col, td.event-label { 
+  width: auto; 
+  min-width: fit-content;
+  max-width: fit-content;
+  background:#f0f0f0; 
+  font-weight:600; 
+}
+th.step-col { writing-mode: vertical-rl; text-orientation: mixed; text-align: center; }
+th:not(.step-col), td:not(.event-label) { 
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  word-wrap: break-word; 
+}
+td.event-label { text-align: center; writing-mode: vertical-rl; text-orientation: mixed; }
+.phase-header-row { background: #333; }
+.phase-header { background: #333; color: white; text-align: center; font-weight: bold; padding: 8px; font-size: 14px; }
+.hdr-ship { font-weight: 600; }
+.hdr-pilot { margin-top: 2px; }
+.hdr-device { font-weight: 600; }
+.hdr-device-name { margin-top: 2px; }
+th .init { font-weight: normal; color: #555; }
+.upgrade-name { font-weight: 600; }
+.upgrade-name i { margin-right: 2px; }
+.pilot-ability i { margin-right: 2px; }
+.ability { margin: 2px 0; line-height: 1.2; }
+.ability .xwing-miniatures-font { font-size: 13px; }
+.pilot-ability { margin-top: 2px; }
+.pilot-block { margin-bottom: 6px; }
+.upgrade-block { margin-bottom: 6px; }
+.phase-cell.empty { background: #fafafa; }
+.xwing-miniatures-font { font-family: 'xwing-miniatures'; font-style: normal; }
+code { background: #f5f5f5; padding: 1px 3px; border-radius: 3px; }
+mark { background: #ffeb3b; padding: 1px 2px; border-radius: 2px; font-weight: 600; }
+.de-emphasized { opacity: 0.6; font-weight: normal; }
+/* Sticky headers and phase rows */
+thead th { position: sticky; top: 0; z-index: 10; background: #eee; }
+.phase-header-row { position: sticky; top: 46px; z-index: 9; background: #333; }
+.phase-header { background: #333; color: white; text-align: center; font-weight: bold; padding: 8px; font-size: 14px; }
+
+/* Focus mode styles */
+.header-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.focus-controls { 
+  display: inline-flex;
+  align-items: center;
+}
+.focus-controls button { 
+  margin: 0; 
+  padding: 6px 12px; 
+  border: 1px solid #ccc; 
+  background: #f8f9fa; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 14px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.focus-controls button:hover { background: #e9ecef; }
+.focus-controls button:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  background: #f8f9fa; 
+}
+
+#focusedView {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+#focusedView .focus-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  padding: 15px;
+  margin: 0;
+  height: 60px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  width: max-content;
+  min-width: 300px;
+}
+
+#focusedView .focus-nav-controls #focusInfo {
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#focusedView .focus-nav-controls button {
+  background: #007acc;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+#focusedView .focus-nav-controls button:hover {
+  background: #005a9e;
+}
+
+#focusedView .focus-nav-controls button:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+#focusedContainer {
+  width: 100vw;
+  height: calc(100vh - 80px); /* Account for navigation controls */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  padding: 20px 0 0 0;
+  margin: 0;
+  background: white;
+  box-sizing: border-box;
+}
+
+#focusedContainer .content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  min-height: min-content;
+}
+
+#focusedContainer .table-container {
+  width: max-content;
+  overflow: visible;
+  display: block;
+}
+
+#focusedContainer table {
+  table-layout: fixed;
+  width: max-content;
+  margin: 0;
+  border-collapse: collapse;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#focusedContainer table th,
+#focusedContainer table td {
+  height: auto;
+  vertical-align: top;
+  padding: 4px 6px;
+  border: 1px solid #999;
+  font-size: 13px;
+}
+
+#focusedContainer table th {
+  background: #eee;
+}
+
+#focusedContainer table th.step-col,
+#focusedContainer table td.event-label {
+  width: auto;
+  min-width: fit-content;
+  max-width: fit-content;
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+@media screen and (max-width: 768px) {
+  #focusedContainer table th.step-col,
+  #focusedContainer table td.event-label {
+    width: auto !important;
+    min-width: fit-content !important;
+  }
+}
+
+#focusedContainer table td.event-label {
+  text-align: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+#focusedContainer table th.step-col {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-align: center;
+}
+
+#focusedContainer table th:not(.step-col),
+#focusedContainer table td:not(.event-label) {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* Focus view additional styling */
+#focusedView {
+  /* No additional padding needed with new layout */
+}
+
+/* Ensure phase header rows stick properly in focus view */
+#focusedContainer .phase-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background: #333;
+}
+
+#focusedContainer .phase-header {
+  background: #333;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* Ensure header cells stick in focus view */
+#focusedContainer thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #eee;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="header-container">
+  <h1>Poe Smack Down</h1>
+  <div class="focus-controls">
+    <button onclick="toggleFocusMode()">🔍 Focus</button>
+  </div>
+</div>
+
+<div id="tableContainer" class="table-container">
+  <table id="mainTable">
+    <thead><tr><th class="step-col activation_phase-activation engagement_phase-start engagement_phase-engage unit-0 unit-1 unit-2 unit-3">Step</th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage unit-0"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <span class="ship-name">T-70 X-wing</span></div><div class="hdr-pilot"><span class="upgrade-name">C’ai Threnalli</span> <span class="init">(i4)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage unit-1"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <span class="ship-name">T-70 X-wing</span></div><div class="hdr-pilot"><span class="upgrade-name">Temmin Wexley</span> <span class="init">(i4)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage unit-2"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <span class="ship-name">T-70 X-wing</span></div><div class="hdr-pilot"><span class="upgrade-name">Ello Asty</span> <span class="init">(i5)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage unit-3"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-scavengedyt1300" title="Scavenged YT-1300"></i> <span class="ship-name">Scavenged YT-1300</span></div><div class="hdr-pilot"><span class="upgrade-name">Poe Dameron</span> <span class="init">(i6)</span></div></th></tr></thead>
+    <tbody>
+      <tr class="phase-header-row"><td colspan="5" class="phase-header activation_phase-activation unit-0 unit-1 unit-2 unit-3">Activation Phase</td></tr>
+<tr><td class="event-label activation_phase-activation unit-0 unit-1 unit-2" rowspan="1">activation</td><td class="phase-cell activation_phase-activation unit-0"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i>, roll 1 fewer attack die. </span><mark>Before you activate</mark>, you may flip this card.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Back: </span><mark>Before you activate</mark>, you may flip this card.</div></div></td><td class="phase-cell activation_phase-activation unit-1"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i>, roll 1 fewer attack die. </span><mark>Before you activate</mark>, you may flip this card.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Back: </span><mark>Before you activate</mark>, you may flip this card.</div></div></td><td class="phase-cell activation_phase-activation unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-astromech" title="astromech"></i> <strong>R5-X3</strong></div><div class="ability upgrade-ability"><mark>Before you activate or engage</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to ignore obstacles until the end of this phase.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i>, roll 1 fewer attack die. </span><mark>Before you activate</mark>, you may flip this card.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Back: </span><mark>Before you activate</mark>, you may flip this card.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td></tr>
+<tr><td class="event-label activation_phase-activation unit-2" rowspan="1">reveal dial</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-2"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>Ello Asty</strong></div><div class="ability pilot-ability"><mark>After you reveal a red Tallon Roll [<i class="xwing-miniatures-font xwing-miniatures-font-trollleft" title="Tallon Roll Left" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-trollright" title="Tallon Roll Right" style="color: red"></i>] maneuver, if you have 2 or fewer stress tokens</mark>, treat that maneuver as white.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td></tr>
+<tr><td class="event-label activation_phase-activation unit-3 unit-0 unit-2" rowspan="2">execute maneuver</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-3"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-scavengedyt1300" title="Scavenged YT-1300"></i> <strong>Poe Dameron</strong></div><div class="ability pilot-ability"><mark>Before you execute a maneuver</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, ignore obstacles during that maneuver. After you fully execute a maneuver, you may spend 2 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to perform a white <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll" style="color: red"></i> action. Then if you performed a <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll" style="color: red"></i> action, expose 1 damage card, if able.</div></div></td></tr>
+<tr><td class="phase-cell activation_phase-activation unit-0"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>C’ai Threnalli</strong></div><div class="ability pilot-ability"><mark>After you fully execute a maneuver, if you moved through a friendly ship</mark>, you may perform an <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> action.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Marg Sabl Closure</strong></div><div class="ability upgrade-ability"><mark>After you fully execute a maneuver, if you moved through an obstacle, structure, or huge ship, or if you deployed</mark>, you may choose 1 enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> at range 1-2. That ship gains 1 strain token.</div></div></td><td class="phase-cell activation_phase-activation unit-3"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-scavengedyt1300" title="Scavenged YT-1300"></i> <strong>Poe Dameron</strong></div><div class="ability pilot-ability"><span class="de-emphasized">Before you execute a maneuver, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, ignore obstacles during that maneuver. </span><mark>After you fully execute a maneuver</mark>, you may spend 2 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to perform a white <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll" style="color: red"></i> action. Then if you performed a <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll" style="color: red"></i> action, expose 1 damage card, if able.</div></div></td></tr>
+<tr><td class="event-label activation_phase-activation unit-0 unit-1 unit-2 unit-3" rowspan="1">Choose Action</td><td class="phase-cell activation_phase-activation unit-0"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td><td class="phase-cell activation_phase-activation unit-1"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td><td class="phase-cell activation_phase-activation unit-2"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td><td class="phase-cell activation_phase-activation unit-3"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-scavengedyt1300" title="Scavenged YT-1300"></i> <strong>Scavenged YT-1300</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost" style="color: red"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-rotatearc" title="Rotate Arc" style="color: red"></i></div></div></td></tr>
+<tr class="phase-header-row"><td colspan="5" class="phase-header engagement_phase-start engagement_phase-engage unit-0 unit-1 unit-2 unit-3">Engagement Phase</td></tr>
+<tr><td class="event-label engagement_phase-start unit-1" rowspan="1">Engagement Phase</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell engagement_phase-start unit-1"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>Temmin Wexley</strong></div><div class="ability pilot-ability"><mark>At the start of the Engagement Phase</mark>, each friendly T-70 X-wing at range 0-3 may gain 1 strain token to flip its equipped <i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="Configuration"></i> upgrade. If it does, that ship gains 1 calculate token.</div></div></td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td></tr>
+<tr><td class="event-label engagement_phase-engage unit-2" rowspan="1">engage</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-astromech" title="astromech"></i> <strong>R5-X3</strong></div><div class="ability upgrade-ability"><mark>Before you activate or engage</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to ignore obstacles until the end of this phase.</div></div></td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td></tr>
+<tr><td class="event-label engagement_phase-engage unit-0 unit-1 unit-2 unit-3" rowspan="1">Choose Weapon</td><td class="phase-cell engagement_phase-engage unit-0"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-1"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-2"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-t70xwing" title="T-70 X-wing"></i> <strong>T-70 X-wing</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-3"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-scavengedyt1300" title="Scavenged YT-1300"></i> <strong>Scavenged YT-1300</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-doubleturretarc" title="Double Turret Arc" style="color: red"></i></div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-0 unit-1 unit-2 unit-3" rowspan="1">attacks</td><td class="phase-cell engagement_phase-engage unit-0"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Deadeye Shot</strong></div><div class="ability upgrade-ability"><mark>While you perform a primary attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result or change 1 <i class="xwing-miniatures-font xwing-miniatures-font-crit" title="Critical Hit"></i> result to a <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result. If you do, the defender exposes 1 of its damage cards.</div></div><div class="upgrade-block"><div class="upgrade-name"><strong>Advanced Optics</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack</mark>, you may spend 1 focus token to change 1 of your blank results to a <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: </span><mark>While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, roll 1 fewer attack die. Before you activate, you may flip this card.</div></div></td><td class="phase-cell engagement_phase-engage unit-1"><div class="upgrade-block"><div class="upgrade-name"><strong>Advanced Optics</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack</mark>, you may spend 1 focus token to change 1 of your blank results to a <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: </span><mark>While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, roll 1 fewer attack die. Before you activate, you may flip this card.</div></div></td><td class="phase-cell engagement_phase-engage unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Trick Shot</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack that is obstructed by an obstacle</mark>, roll 1 additional attack die.</div></div><div class="upgrade-block"><div class="upgrade-name"><strong>Advanced Optics</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack</mark>, you may spend 1 focus token to change 1 of your blank results to a <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-configuration" title="configuration"></i> <strong>Integrated S-foils</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">Front: </span><mark>While you perform a primary attack, if the defender is not in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, roll 1 fewer attack die. Before you activate, you may flip this card.</div></div></td><td class="phase-cell engagement_phase-engage unit-3"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Trick Shot</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack that is obstructed by an obstacle</mark>, roll 1 additional attack die.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-gunner" title="gunner"></i> <strong>Rey</strong></div><div class="ability upgrade-ability"><mark>While you defend or perform an attack, if the enemy ship is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to change 1 of your blank results to a <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result.</div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-3" rowspan="1">defends</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-3"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-gunner" title="gunner"></i> <strong>Rey</strong></div><div class="ability upgrade-ability"><mark>While you defend or perform an attack, if the enemy ship is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to change 1 of your blank results to a <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i> result.</div></div></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="focusedView">
+  <div id="focusedContainer">
+    <div class="content-wrapper">
+      <div class="table-container">
+        <!-- Table will be moved here dynamically -->
+      </div>
+      <div class="focus-nav-controls">
+        <button onclick="navigateFocus('prev')" id="prevBtn">◀</button>
+        <span id="focusInfo"></span>
+        <button onclick="closeFocusMode()">✕</button>
+        <button onclick="navigateFocus('next')" id="nextBtn">▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Array of all unique game steps from all game phases
+const allGameSteps = ["activation_phase-activation", "engagement_phase-start", "engagement_phase-engage"];
+// Array of all unit class names
+const allUnitClasses = ["unit-0", "unit-1", "unit-2", "unit-3"];
+
+let focusMode = false;
+let currentGameStepIndex = 0;
+let currentUnitIndex = 0;
+
+function toggleFocusMode() {
+  if (!focusMode && allGameSteps.length > 0 && allUnitClasses.length > 0) {
+    focusMode = true;
+    currentGameStepIndex = 0;
+    currentUnitIndex = 0;
+    
+    // Move table to focus container table container
+    const mainTable = document.getElementById('mainTable');
+    const tableContainer = document.querySelector('#focusedContainer .table-container');
+    tableContainer.appendChild(mainTable);
+    
+    showGameStepAndUnit(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+    document.getElementById('focusedView').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Enter fullscreen mode
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log('Fullscreen request failed:', err);
+      });
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    }
+    
+    // Adjust navigation controls width to match table
+    setTimeout(() => {
+      const table = document.querySelector('#focusedContainer table');
+      const navControls = document.querySelector('#focusedView .focus-nav-controls');
+      if (table && navControls) {
+        const tableWidth = table.offsetWidth;
+        navControls.style.width = Math.max(tableWidth, 300) + 'px';
+      }
+    }, 100);
+    
+    updateFocusInfo();
+  }
+}
+
+function closeFocusMode() {
+  focusMode = false;
+  
+  // Exit fullscreen mode
+  if (document.exitFullscreen) {
+    document.exitFullscreen().catch(err => {
+      console.log('Exit fullscreen failed:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen();
+  }
+  
+  // Move table back to original container
+  const mainTable = document.getElementById('mainTable');
+  const tableContainer = document.getElementById('tableContainer');
+  tableContainer.appendChild(mainTable);
+  
+  document.getElementById('focusedView').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  // Show all elements again
+  showAllElements();
+}
+
+function navigateFocus(direction) {
+  if (!focusMode || allGameSteps.length === 0 || allUnitClasses.length === 0) return;
+  
+  // Store the direction for auto-skip logic
+  showGameStepAndUnit._lastDirection = direction;
+  
+  if (direction === 'next') {
+    currentUnitIndex++;
+    if (currentUnitIndex >= allUnitClasses.length) {
+      currentUnitIndex = 0;
+      currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+    }
+  } else if (direction === 'prev') {
+    currentUnitIndex--;
+    if (currentUnitIndex < 0) {
+      currentUnitIndex = allUnitClasses.length - 1;
+      currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+    }
+  }
+  
+  showGameStepAndUnit(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+  
+  // Adjust navigation controls width to match current table content
+  setTimeout(() => {
+    const table = document.querySelector('#focusedContainer table');
+    const navControls = document.querySelector('#focusedView .focus-nav-controls');
+    if (table && navControls) {
+      const tableWidth = table.offsetWidth;
+      navControls.style.width = Math.max(tableWidth, 300) + 'px';
+    }
+  }, 50);
+  
+  updateFocusInfo();
+}
+
+function hasVisibleContent() {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return false;
+  
+  // Get all visible phase-cell elements
+  const visiblePhaseCells = mainTable.querySelectorAll('td.phase-cell:not(.hidden)');
+  
+  // Check if any visible phase-cell does NOT have the 'empty' class
+  for (let cell of visiblePhaseCells) {
+    if (!cell.classList.contains('empty')) {
+      return true; // Found at least one non-empty cell
+    }
+  }
+  
+  return false; // All visible phase-cells are empty
+}
+
+function showGameStepAndUnit(gameStep, unitClass) {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return;
+  
+  // Get all th and td elements
+  const allCells = mainTable.querySelectorAll('th, td');
+  
+  // Hide all cells first
+  allCells.forEach(cell => {
+    cell.classList.add('hidden');
+  });
+  
+  // Show cells that have both the current game step and unit class in their class attribute
+  allCells.forEach(cell => {
+    if (cell.classList.contains(gameStep) && cell.classList.contains(unitClass)) {
+      cell.classList.remove('hidden');
+    }
+  });
+  
+  // Check if all visible phase-cells are empty and auto-skip if needed
+  if (!hasVisibleContent()) {
+    // Use a flag to prevent infinite recursion
+    if (!showGameStepAndUnit._isAutoSkipping) {
+      showGameStepAndUnit._isAutoSkipping = true;
+      // Determine direction based on last navigation (default to next)
+      const direction = showGameStepAndUnit._lastDirection || 'next';
+      autoSkipToNextContent(direction);
+      showGameStepAndUnit._isAutoSkipping = false;
+    }
+  }
+}
+
+function autoSkipToNextContent(direction) {
+  if (!focusMode || allGameSteps.length === 0 || allUnitClasses.length === 0) return;
+  
+  const maxAttempts = allGameSteps.length * allUnitClasses.length;
+  let attempts = 0;
+  
+  // Keep trying to find content until we find some or exhaust all possibilities
+  while (attempts < maxAttempts) {
+    attempts++;
+    
+    // Move to next/previous combination
+    if (direction === 'next') {
+      currentUnitIndex++;
+      if (currentUnitIndex >= allUnitClasses.length) {
+        currentUnitIndex = 0;
+        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+      }
+    } else if (direction === 'prev') {
+      currentUnitIndex--;
+      if (currentUnitIndex < 0) {
+        currentUnitIndex = allUnitClasses.length - 1;
+        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+      }
+    }
+    
+    // Show the new combination without auto-skipping (to avoid recursion)
+    showGameStepAndUnitWithoutAutoSkip(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+    
+    // Check if this combination has content
+    if (hasVisibleContent()) {
+      updateFocusInfo();
+      return; // Found content, stop searching
+    }
+  }
+  
+  // If we get here, no content was found in any combination
+  updateFocusInfo();
+}
+
+function showGameStepAndUnitWithoutAutoSkip(gameStep, unitClass) {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return;
+  
+  // Get all th and td elements
+  const allCells = mainTable.querySelectorAll('th, td');
+  
+  // Hide all cells first
+  allCells.forEach(cell => {
+    cell.classList.add('hidden');
+  });
+  
+  // Show cells that have both the current game step and unit class in their class attribute
+  allCells.forEach(cell => {
+    if (cell.classList.contains(gameStep) && cell.classList.contains(unitClass)) {
+      cell.classList.remove('hidden');
+    }
+  });
+}
+
+function showAllElements() {
+  const mainTable = document.querySelector('#mainTable');
+  if (!mainTable) return;
+  
+  // Remove hidden class from all elements
+  const hiddenElements = mainTable.querySelectorAll('.hidden');
+  hiddenElements.forEach(element => {
+    element.classList.remove('hidden');
+  });
+}
+
+function updateFocusInfo() {
+  const focusInfo = document.getElementById('focusInfo');
+  if (focusInfo && allGameSteps.length > 0 && allUnitClasses.length > 0) {
+    const currentStep = allGameSteps[currentGameStepIndex];
+    const currentUnit = allUnitClasses[currentUnitIndex];
+    const stepDisplay = currentStep.replace(/_/g, ' ').replace(/-/g, ' → ');
+    const totalCombinations = allGameSteps.length * allUnitClasses.length;
+    const currentCombination = (currentGameStepIndex * allUnitClasses.length) + currentUnitIndex + 1;
+    focusInfo.textContent = `${currentCombination}/${totalCombinations}: ${stepDisplay} (${currentUnit})`;
+  }
+  
+  // Update button states
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  if (prevBtn) prevBtn.disabled = false;
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+// Handle keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (!focusMode) return;
+  
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    navigateFocus('next');
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    navigateFocus('prev');
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeFocusMode();
+  }
+});
+</script>
+</body>
+</html>

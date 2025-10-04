@@ -1,0 +1,92 @@
+{
+  "description": "",
+  "faction": "resistance",
+  "name": "Poe Smack Down",
+  "pilots": [
+    {
+      "id": "poedameron-scavengedyt1300",
+      "name": "poedameron-scavengedyt1300",
+      "points": 7,
+      "ship": "scavengedyt1300",
+      "upgrades": {
+        "talent": [
+          "trickshot"
+        ],
+        "gunner": [
+          "rey-gunner"
+        ],
+        "modification": [
+          "engineupgrade"
+        ],
+        "title": [
+          "reysmillenniumfalcon"
+        ]
+      }
+    },
+    {
+      "id": "temminwexley-swz68",
+      "name": "temminwexley-swz68",
+      "points": 4,
+      "ship": "t70xwing",
+      "upgrades": {
+        "tech": [
+          "advancedoptics"
+        ],
+        "astromech": [
+          "r4astromech"
+        ],
+        "configuration": [
+          "integratedsfoils"
+        ]
+      }
+    },
+    {
+      "id": "caithrenalli",
+      "name": "caithrenalli",
+      "points": 4,
+      "ship": "t70xwing",
+      "upgrades": {
+        "talent": [
+          "deadeyeshot"
+        ],
+        "tech": [
+          "advancedoptics"
+        ],
+        "configuration": [
+          "integratedsfoils"
+        ]
+      }
+    },
+    {
+      "id": "elloasty",
+      "name": "elloasty",
+      "points": 5,
+      "ship": "t70xwing",
+      "upgrades": {
+        "talent": [
+          "trickshot",
+          "margsablclosure"
+        ],
+        "tech": [
+          "advancedoptics"
+        ],
+        "astromech": [
+          "r5x3"
+        ],
+        "configuration": [
+          "integratedsfoils"
+        ]
+      }
+    }
+  ],
+  "points": 20,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Resistance&d=v9ZbZ20Z604X133WWWW187WW107W193Y443XW186WW5WW175WY449X343WW186WW175WY299X133W331W186W205WW175W&sn=Poe%20Smack%20Down&obs="
+    }
+  },
+  "version": "R2",
+  "ruleset": "XWA"
+}
