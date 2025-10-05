@@ -1,0 +1,108 @@
+{
+  "description": "",
+  "faction": "galacticrepublic",
+  "name": "New Squadron",
+  "pilots": [
+    {
+      "id": "plokoon",
+      "name": "plokoon",
+      "points": 4,
+      "ship": "delta7aethersprite",
+      "upgrades": {
+        "force-power": [
+          "brilliantevasion",
+          "predictiveshot"
+        ]
+      }
+    },
+    {
+      "id": "macewindu",
+      "name": "macewindu",
+      "points": 4,
+      "ship": "delta7aethersprite",
+      "upgrades": {
+        "force-power": [
+          "brilliantevasion",
+          "predictiveshot"
+        ]
+      }
+    },
+    {
+      "id": "hawk",
+      "name": "hawk",
+      "points": 5,
+      "ship": "laatigunship",
+      "upgrades": {
+        "talent": [
+          "squadleader"
+        ],
+        "crew": [
+          "ghostcompany",
+          "tacticalofficer"
+        ],
+        "gunner": [
+          "clonecommandercody"
+        ]
+      }
+    },
+    {
+      "id": "ricolie",
+      "name": "ricolie",
+      "points": 4,
+      "ship": "nabooroyaln1starfighter",
+      "upgrades": {
+        "talent": [
+          "margsablclosure",
+          "trickshot"
+        ],
+        "sensor": [
+          "collisiondetector"
+        ]
+      }
+    },
+    {
+      "id": "tucker",
+      "name": "tucker",
+      "points": 3,
+      "ship": "v19torrentstarfighter",
+      "upgrades": {
+        "talent": [
+          "dedicated"
+        ],
+        "missile": [
+          "barragerockets"
+        ]
+      }
+    },
+    {
+      "id": "wolffe-siegeofcoruscant",
+      "name": "wolffe-siegeofcoruscant",
+      "points": 5,
+      "ship": "arc170starfighter"
+    },
+    {
+      "id": "axe",
+      "name": "axe",
+      "points": 3,
+      "ship": "v19torrentstarfighter",
+      "upgrades": {
+        "talent": [
+          "dedicated"
+        ],
+        "missile": [
+          "protonrockets"
+        ]
+      }
+    }
+  ],
+  "points": 28,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Galactic%20Republic&d=v9ZbZ20Z312X199W203WWWY314X199W203WWWY415X131WWW351W61W225WWY333X331W133W112WWY319X210W97WWY578X492W89W365Y318X210W102W&sn=New%20Squadron&obs="
+    }
+  },
+  "version": "R2",
+  "ruleset": "XWA"
+}

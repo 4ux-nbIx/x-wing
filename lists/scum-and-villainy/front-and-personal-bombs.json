@@ -1,0 +1,86 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Front and Personal Bombs",
+  "pilots": [
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 6,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "talent": [
+          "fearless"
+        ],
+        "crew": [
+          "qira"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "captainnym",
+      "name": "captainnym",
+      "points": 5,
+      "ship": "scurrgh6bomber",
+      "upgrades": {
+        "device": [
+          "seismiccharges",
+          "thermaldetonators"
+        ],
+        "title": [
+          "havoc"
+        ],
+        "sensor": [
+          "trajectorysimulator"
+        ],
+        "astromech": [
+          "genius"
+        ]
+      }
+    },
+    {
+      "id": "guri",
+      "name": "guri",
+      "points": 5,
+      "ship": "starviperclassattackplatform",
+      "upgrades": {
+        "talent": [
+          "marksmanship"
+        ],
+        "tech": [
+          "primedthrusters"
+        ]
+      }
+    },
+    {
+      "id": "talonbanecobra",
+      "name": "talonbanecobra",
+      "points": 4,
+      "ship": "kihraxzfighter",
+      "upgrades": {
+        "talent": [
+          "predator"
+        ]
+      }
+    }
+  ],
+  "points": 20,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v9ZbZ20Z126X121W55W92WW446W160Y144XWWWW71W339WW149W114W1Y147X125W178WWWWY119X127WWWWW&sn=Front%20and%20Personal%20Bombs&obs="
+    }
+  },
+  "version": "R2",
+  "ruleset": "XWA"
+}

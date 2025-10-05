@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>New Squadron</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xwing-miniatures-font/dist/xwing-miniatures.css" />
+<style>
+body { 
+  font-family: Arial, sans-serif; 
+  margin: 1rem; 
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  body { margin: 0.5rem; }
+  h1 { font-size: 1.3rem; }
+  th, td { font-size: 12px; padding: 3px 4px; }
+  
+  /* Focus view mobile fixes */
+  #focusedContainer {
+    height: calc(100vh - 50px) !important;
+    padding: 5px 5px 0 5px !important;
+    padding-bottom: 60px !important;
+    width: 100vw !important;
+    overflow: auto !important;
+  }
+  
+  #focusedContainer .content-wrapper {
+    max-width: calc(100vw - 10px) !important;
+    width: 100% !important;
+  }
+  
+  #focusedContainer .table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+  }
+  
+  #focusedContainer table {
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+  
+  #focusedContainer table th:not(.step-col),
+  #focusedContainer table td:not(.event-label) {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+  }
+  
+  #focusedView .focus-nav-controls {
+    width: 100vw !important;
+    left: 0 !important;
+    transform: none !important;
+    height: 50px !important;
+    padding: 5px 10px !important;
+    min-width: unset !important;
+    box-sizing: border-box !important;
+  }
+  
+  #focusedView .focus-nav-controls button {
+    min-width: 32px !important;
+    min-height: 32px !important;
+    font-size: 16px !important;
+    padding: 4px 8px !important;
+  }
+  
+  #focusedView .focus-nav-controls #focusInfo {
+    font-size: 10px !important;
+    padding: 0 8px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+  }
+}
+h1 { font-size: 1.5rem; }
+.table-container { 
+  width: 100%; 
+}
+table { 
+  border-collapse: collapse; 
+  table-layout: auto; 
+  width: max-content;
+  min-width: 100%;
+}
+th, td { 
+  border: 1px solid #999; 
+  padding: 4px 6px; 
+  vertical-align: top; 
+  font-size: 13px;
+  height: auto;
+}
+th { background: #eee; }
+th.step-col, td.event-label { 
+  width: auto; 
+  min-width: fit-content;
+  max-width: fit-content;
+  background:#f0f0f0; 
+  font-weight:600; 
+}
+th.step-col { writing-mode: vertical-rl; text-orientation: mixed; text-align: center; }
+th:not(.step-col), td:not(.event-label) { 
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  word-wrap: break-word; 
+}
+td.event-label { text-align: center; writing-mode: vertical-rl; text-orientation: mixed; }
+.phase-header-row { background: #333; }
+.phase-header { background: #333; color: white; text-align: center; font-weight: bold; padding: 8px; font-size: 14px; }
+.hdr-ship { font-weight: 600; }
+.hdr-pilot { margin-top: 2px; }
+.hdr-device { font-weight: 600; }
+.hdr-device-name { margin-top: 2px; }
+th .init { font-weight: normal; color: #555; }
+.upgrade-name { font-weight: 600; }
+.upgrade-name i { margin-right: 2px; }
+.pilot-ability i { margin-right: 2px; }
+.ability { margin: 2px 0; line-height: 1.2; }
+.ability .xwing-miniatures-font { font-size: 13px; }
+.pilot-ability { margin-top: 2px; }
+.pilot-block { margin-bottom: 6px; }
+.upgrade-block { margin-bottom: 6px; }
+.phase-cell.empty { background: #fafafa; }
+.xwing-miniatures-font { font-family: 'xwing-miniatures'; font-style: normal; }
+code { background: #f5f5f5; padding: 1px 3px; border-radius: 3px; }
+mark { background: #ffeb3b; padding: 1px 2px; border-radius: 2px; font-weight: 600; }
+.de-emphasized { opacity: 0.6; font-weight: normal; }
+/* Sticky headers and phase rows */
+thead th { position: sticky; top: 0; z-index: 10; background: #eee; }
+.phase-header-row { position: sticky; top: 46px; z-index: 9; background: #333; }
+.phase-header { background: #333; color: white; text-align: center; font-weight: bold; padding: 8px; font-size: 14px; }
+
+/* Focus mode styles */
+.header-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.focus-controls { 
+  display: inline-flex;
+  align-items: center;
+}
+.focus-controls button { 
+  margin: 0; 
+  padding: 6px 12px; 
+  border: 1px solid #ccc; 
+  background: #f8f9fa; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 14px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.focus-controls button:hover { background: #e9ecef; }
+.focus-controls button:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+  background: #f8f9fa; 
+}
+
+#focusedView {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+#focusedView .focus-nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  padding: 15px;
+  margin: 0;
+  height: 60px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  width: max-content;
+  min-width: 300px;
+}
+
+#focusedView .focus-nav-controls #focusInfo {
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#focusedView .focus-nav-controls button {
+  background: #007acc;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+#focusedView .focus-nav-controls button:hover {
+  background: #005a9e;
+}
+
+#focusedView .focus-nav-controls button:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+#focusedContainer {
+  width: 100vw;
+  height: calc(100vh - 80px); /* Account for navigation controls */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+  padding: 20px 0 0 0;
+  margin: 0;
+  background: white;
+  box-sizing: border-box;
+}
+
+#focusedContainer .content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  min-height: min-content;
+}
+
+#focusedContainer .table-container {
+  width: max-content;
+  overflow: visible;
+  display: block;
+}
+
+#focusedContainer table {
+  table-layout: fixed;
+  width: max-content;
+  margin: 0;
+  border-collapse: collapse;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+#focusedContainer table th,
+#focusedContainer table td {
+  height: auto;
+  vertical-align: top;
+  padding: 4px 6px;
+  border: 1px solid #999;
+  font-size: 13px;
+}
+
+#focusedContainer table th {
+  background: #eee;
+}
+
+#focusedContainer table th.step-col,
+#focusedContainer table td.event-label {
+  width: auto;
+  min-width: fit-content;
+  max-width: fit-content;
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+@media screen and (max-width: 768px) {
+  #focusedContainer table th.step-col,
+  #focusedContainer table td.event-label {
+    width: auto !important;
+    min-width: fit-content !important;
+  }
+}
+
+#focusedContainer table td.event-label {
+  text-align: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+#focusedContainer table th.step-col {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-align: center;
+}
+
+#focusedContainer table th:not(.step-col),
+#focusedContainer table td:not(.event-label) {
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* Focus view additional styling */
+#focusedView {
+  /* No additional padding needed with new layout */
+}
+
+/* Ensure phase header rows stick properly in focus view */
+#focusedContainer .phase-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background: #333;
+}
+
+#focusedContainer .phase-header {
+  background: #333;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px;
+  font-size: 14px;
+}
+
+/* Ensure header cells stick in focus view */
+#focusedContainer thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #eee;
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="header-container">
+  <h1>New Squadron</h1>
+  <div class="focus-controls">
+    <button onclick="toggleFocusMode()">🔍 Focus</button>
+  </div>
+</div>
+
+<div id="tableContainer" class="table-container">
+  <table id="mainTable">
+    <thead><tr><th class="step-col activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6">Step</th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-0"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <span class="ship-name">V-19 Torrent Starfighter</span></div><div class="hdr-pilot"><span class="upgrade-name">“Tucker”</span> <span class="init">(i2)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-1"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <span class="ship-name">V-19 Torrent Starfighter</span></div><div class="hdr-pilot"><span class="upgrade-name">“Axe”</span> <span class="init">(i3)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-2"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <span class="ship-name">LAAT/i Gunship</span></div><div class="hdr-pilot"><span class="upgrade-name">“Hawk”</span> <span class="init">(i4)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-3"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <span class="ship-name">ARC-170 Starfighter</span></div><div class="hdr-pilot"><span class="upgrade-name">“Wolffe”</span> <span class="init">(i4)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-4"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <span class="ship-name">Delta-7 Aethersprite</span></div><div class="hdr-pilot"><span class="upgrade-name">Mace Windu</span> <span class="init">(i4)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-5"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <span class="ship-name">Naboo Royal N-1 Starfighter</span></div><div class="hdr-pilot"><span class="upgrade-name">Ric Olié</span> <span class="init">(i5)</span></div></th><th class="activation_phase-activation engagement_phase-start engagement_phase-engage end_phase-start unit-6"><div class="hdr-ship"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <span class="ship-name">Delta-7 Aethersprite</span></div><div class="hdr-pilot"><span class="upgrade-name">Plo Koon</span> <span class="init">(i5)</span></div></th></tr></thead>
+    <tbody>
+      <tr class="phase-header-row"><td colspan="8" class="phase-header activation_phase-activation unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6">Activation Phase</td></tr>
+<tr><td class="event-label activation_phase-activation unit-4 unit-5 unit-6" rowspan="1">execute maneuver</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-4"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Mace Windu</strong></div><div class="ability pilot-ability"><mark>After you fully execute a red maneuver</mark>, recover 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i>.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Fine-tuned Controls</strong></div><div class="ability ship-ability"><mark>After you fully execute a maneuver</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to perform a <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i> action.</div></div></td><td class="phase-cell activation_phase-activation unit-5"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <strong>Full Throttle</strong></div><div class="ability ship-ability"><mark>After you fully execute a speed 3-5 maneuver</mark>, you may perform an <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> action.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Marg Sabl Closure</strong></div><div class="ability upgrade-ability"><mark>After you fully execute a maneuver, if you moved through an obstacle, structure, or huge ship, or if you deployed</mark>, you may choose 1 enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> at range 1-2. That ship gains 1 strain token.</div></div></td><td class="phase-cell activation_phase-activation unit-6"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Fine-tuned Controls</strong></div><div class="ability ship-ability"><mark>After you fully execute a maneuver</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to perform a <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i> action.</div></div></td></tr>
+<tr><td class="event-label activation_phase-activation unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6" rowspan="1">Choose Action</td><td class="phase-cell activation_phase-activation unit-0"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>V-19 Torrent Starfighter</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i> <i class="xwing-miniatures-font xwing-miniatures-font-linked" title="Linked"></i> <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade" style="color: red"></i></div></div></td><td class="phase-cell activation_phase-activation unit-1"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>V-19 Torrent Starfighter</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i> <i class="xwing-miniatures-font xwing-miniatures-font-linked" title="Linked"></i> <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade" style="color: red"></i></div></div></td><td class="phase-cell activation_phase-activation unit-2"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>LAAT/i Gunship</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-reinforce" title="Reinforce" style="color: red"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-rotatearc" title="Rotate Arc"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-reload" title="Reload"></i></div></div></td><td class="phase-cell activation_phase-activation unit-3"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>ARC-170 Starfighter</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll" style="color: red"></i></div></div></td><td class="phase-cell activation_phase-activation unit-4"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Delta-7 Aethersprite</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade" style="color: violet"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td><td class="phase-cell activation_phase-activation unit-5"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <strong>Naboo Royal N-1 Starfighter</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td><td class="phase-cell activation_phase-activation unit-6"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Delta-7 Aethersprite</strong></div><div class="ability ship-ability"><mark>Action:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade" style="color: violet"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-lock" title="Lock"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i></div></div></td></tr>
+<tr><td class="event-label activation_phase-activation unit-2 unit-3 unit-5" rowspan="1">perform action</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Squad Leader</strong></div><div class="ability upgrade-ability"><mark>While you coordinate</mark>, the ship you choose can perform an action only if that action is also on your action bar.</div></div></td><td class="phase-cell activation_phase-activation unit-3"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-astromech" title="astromech"></i> <strong>Q7 Astromech</strong></div><div class="ability upgrade-ability"><mark>While you barrel roll or boost</mark>, you can move through and overlap obstacles.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-5"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-sensor" title="sensor"></i> <strong>Collision Detector</strong></div><div class="ability upgrade-ability"><mark>While you boost or barrel roll</mark>, you can move through and overlap obstacles. After you move through or overlap an obstacle, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to ignore its effects until the end of the round.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td></tr>
+<tr><td class="event-label activation_phase-activation unit-5" rowspan="1">move</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell empty activation_phase-activation">&nbsp;</td><td class="phase-cell activation_phase-activation unit-5"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-sensor" title="sensor"></i> <strong>Collision Detector</strong></div><div class="ability upgrade-ability"><span class="de-emphasized">While you boost or barrel roll, you can move through and overlap obstacles. </span><mark>After you move through or overlap an obstacle</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to ignore its effects until the end of the round.</div></div></td><td class="phase-cell empty activation_phase-activation">&nbsp;</td></tr>
+<tr class="phase-header-row"><td colspan="8" class="phase-header engagement_phase-start engagement_phase-engage unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6">Engagement Phase</td></tr>
+<tr><td class="event-label engagement_phase-start unit-6" rowspan="1">Engagement Phase</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell empty engagement_phase-start">&nbsp;</td><td class="phase-cell engagement_phase-start unit-6"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Plo Koon</strong></div><div class="ability pilot-ability"><mark>At the start of the Engagement Phase</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> and choose another friendly ship at range 0-2. If you do, you may transfer 1 green token to it or transfer one orange token from it to yourself.</div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6" rowspan="1">Choose Weapon</td><td class="phase-cell engagement_phase-engage unit-0"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>V-19 Torrent Starfighter</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-missile" title="missile"></i> <strong>Barrage Rockets</strong></div><div class="ability attack-details"><i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> <span style="color: red; font-weight: bold;">3</span> <span style="color: black; font-weight: bold;">Range 2-3</span> <i class="xwing-miniatures-font xwing-miniatures-font-rangebonusindicator" title="Range Bonus Indicator" style="color: red"></i></div><div class="ability upgrade-ability"><mark>Attack (<i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>): Spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i></mark>. If the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i>, you may spend 1 or more <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to reroll that many attack dice.</div></div></td><td class="phase-cell engagement_phase-engage unit-1"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>V-19 Torrent Starfighter</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-missile" title="missile"></i> <strong>Proton Rockets</strong></div><div class="ability attack-details"><i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i> <span style="color: red; font-weight: bold;">5</span> <span style="color: black; font-weight: bold;">Range 1-2</span> <i class="xwing-miniatures-font xwing-miniatures-font-rangebonusindicator" title="Range Bonus Indicator" style="color: red"></i></div><div class="ability upgrade-ability"><mark>Attack (<i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i>): Spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i></mark>.</div></div></td><td class="phase-cell engagement_phase-engage unit-2"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>LAAT/i Gunship</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-doubleturretarc" title="Double Turret Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-3"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>ARC-170 Starfighter</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i>, <i class="xwing-miniatures-font xwing-miniatures-font-reararc" title="Rear Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-4"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Delta-7 Aethersprite</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-5"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <strong>Naboo Royal N-1 Starfighter</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td><td class="phase-cell engagement_phase-engage unit-6"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-delta7aethersprite" title="Delta-7 Aethersprite"></i> <strong>Delta-7 Aethersprite</strong></div><div class="ability ship-ability"><mark>Primary Attack:</mark> <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-4 unit-6" rowspan="1">declare attack</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-4"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-forcepower" title="force-power"></i> <strong>Predictive Shot</strong></div><div class="ability upgrade-ability"><mark>After you declare an attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i>. If you do, during the Roll Defense Dice step, the defender cannot roll more defense dice than the number of your <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i>/<i class="xwing-miniatures-font xwing-miniatures-font-crit" title="Critical Hit"></i> results.</div></div></td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-6"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-forcepower" title="force-power"></i> <strong>Predictive Shot</strong></div><div class="ability upgrade-ability"><mark>After you declare an attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i>. If you do, during the Roll Defense Dice step, the defender cannot roll more defense dice than the number of your <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i>/<i class="xwing-miniatures-font xwing-miniatures-font-crit" title="Critical Hit"></i> results.</div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-0 unit-1 unit-3 unit-4 unit-5 unit-6 unit-2" rowspan="2">attacks</td><td class="phase-cell engagement_phase-engage unit-0"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div></td><td class="phase-cell engagement_phase-engage unit-1"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div></td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-3"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>“Wolffe”</strong></div><div class="ability pilot-ability"><mark>While you perform a primary <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> attack</mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to reroll 1 attack die. While you perform a primary <i class="xwing-miniatures-font xwing-miniatures-font-reararc" title="Rear Arc" style="color: red"></i> attack, you may recover 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to roll 1 additional attack die.</div></div><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>“Wolffe”</strong></div><div class="ability pilot-ability"><span class="de-emphasized">While you perform a primary <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> attack, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to reroll 1 attack die. </span><mark>While you perform a primary <i class="xwing-miniatures-font xwing-miniatures-font-reararc" title="Rear Arc" style="color: red"></i> attack</mark>, you may recover 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i> to roll 1 additional attack die.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-crew" title="crew"></i> <strong>Wolfpack</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack</mark>, you may spend a lock belonging to a friendly Plo Koon ship or ship with the Born for This ability that is on the defender to reroll any number of attack dice.</div></div></td><td class="phase-cell engagement_phase-engage unit-4"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div></td><td class="phase-cell engagement_phase-engage unit-5"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <strong>Ric Olié</strong></div><div class="ability pilot-ability"><mark>While you defend or perform a primary attack, if the speed of your revealed maneuver is higher than the enemy ship&#39;s</mark>, roll 1 additional die.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Trick Shot</strong></div><div class="ability upgrade-ability"><mark>While you perform an attack that is obstructed by an obstacle</mark>, roll 1 additional attack die.</div></div></td><td class="phase-cell engagement_phase-engage unit-6"><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>Fire Convergence</strong></div><div class="ability ship-ability"><mark>While a friendly ship performs a non-<i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack, if the defender is in your <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-charge" title="Charge" style="color: orange"></i>. If you do, the attacker rerolls up to 2 attack dice.</div></div></td></tr>
+<tr><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-1"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Axe”</strong></div><div class="ability pilot-ability"><mark>After you defend or perform an attack</mark>, you may choose a friendly ship at range 1-2 in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i>. If you do, transfer 1 green token to that ship.</div></div></td><td class="phase-cell engagement_phase-engage unit-2"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-crew" title="crew"></i> <strong>Ghost Company</strong></div><div class="ability upgrade-ability"><mark>After you perform a primary attack, if you are focused</mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-singleturretarc" title="Single Turret Arc" style="color: red"></i> attack against a ship you have not attacked this round as a bonus attack.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-gunner" title="gunner"></i> <strong>Clone Commander Cody</strong></div><div class="ability upgrade-ability"><mark>After you perform an attack that missed, if 1 or more <i class="xwing-miniatures-font xwing-miniatures-font-hit" title="Hit"></i>/<i class="xwing-miniatures-font xwing-miniatures-font-crit" title="Critical Hit"></i> results were neutralized</mark>, the defender gains 1 strain token.</div></div></td><td class="phase-cell engagement_phase-engage unit-3"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-gunner" title="gunner"></i> <strong>Veteran Tail Gunner</strong></div><div class="ability upgrade-ability"><mark>After you perform a primary <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i> attack</mark>, you may perform a bonus primary <i class="xwing-miniatures-font xwing-miniatures-font-reararc" title="Rear Arc" style="color: red"></i> attack.</div></div></td><td class="phase-cell engagement_phase-engage unit-4"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div></td><td class="phase-cell engagement_phase-engage unit-5"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div></td><td class="phase-cell engagement_phase-engage unit-6"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Tucker”</strong></div><div class="ability pilot-ability"><mark>After a friendly ship at range 1-2 performs an attack against an enemy ship in your <i class="xwing-miniatures-font xwing-miniatures-font-frontarc" title="Front Arc" style="color: red"></i></mark>, you may perform a <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> action.</div></div></td></tr>
+<tr><td class="event-label engagement_phase-engage unit-1 unit-2 unit-3 unit-4 unit-5 unit-6 unit-0" rowspan="2">defends</td><td class="phase-cell engagement_phase-engage unit-0"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Axe”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div></td><td class="phase-cell engagement_phase-engage unit-1"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div></td><td class="phase-cell engagement_phase-engage unit-2"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div></td><td class="phase-cell engagement_phase-engage unit-3"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div></td><td class="phase-cell engagement_phase-engage unit-4"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-forcepower" title="force-power"></i> <strong>Brilliant Evasion</strong></div><div class="ability upgrade-ability"><mark>While you defend, if you are not in the attacker&#39;s <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to change 2 of your <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> results to <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> results.</div></div></td><td class="phase-cell engagement_phase-engage unit-5"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-nabooroyaln1starfighter" title="Naboo Royal N-1 Starfighter"></i> <strong>Ric Olié</strong></div><div class="ability pilot-ability"><mark>While you defend or perform a primary attack, if the speed of your revealed maneuver is higher than the enemy ship&#39;s</mark>, roll 1 additional die.</div></div></td><td class="phase-cell engagement_phase-engage unit-6"><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-talent" title="talent"></i> <strong>Dedicated</strong> (<i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> “Tucker”)</div><div class="ability upgrade-ability"><mark>While another friendly ship in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i> at range 0-2 defends, if it is limited or has the Dedicated upgrade and you are not strained</mark>, you may gain 1 strain token. If you do, the defender rerolls 1 of their blank results.</div></div><div class="ship-ability-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-arc170starfighter" title="ARC-170 Starfighter"></i> <strong>Born for This</strong></div><div class="ability ship-ability"><mark>While another friendly ship at range 0-2 defends, if you are not strained</mark>, it may spend your focus and evade tokens as if that ship has them. If it does, you gain 1 strain token.</div></div><div class="upgrade-block"><div class="upgrade-name"><i class="xwing-miniatures-font xwing-miniatures-font-forcepower" title="force-power"></i> <strong>Brilliant Evasion</strong></div><div class="ability upgrade-ability"><mark>While you defend, if you are not in the attacker&#39;s <i class="xwing-miniatures-font xwing-miniatures-font-bullseyearc" title="Bullseye Arc" style="color: red"></i></mark>, you may spend 1 <i class="xwing-miniatures-font xwing-miniatures-font-forcecharge" title="Force" style="color: violet"></i> to change 2 of your <i class="xwing-miniatures-font xwing-miniatures-font-focus" title="Focus"></i> results to <i class="xwing-miniatures-font xwing-miniatures-font-evade" title="Evade"></i> results.</div></div></td></tr>
+<tr><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell engagement_phase-engage unit-1"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-v19torrentstarfighter" title="V-19 Torrent Starfighter"></i> <strong>“Axe”</strong></div><div class="ability pilot-ability"><mark>After you defend or perform an attack</mark>, you may choose a friendly ship at range 1-2 in your <i class="xwing-miniatures-font xwing-miniatures-font-leftarc" title="Left Arc" style="color: red"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-rightarc" title="Right Arc" style="color: red"></i>. If you do, transfer 1 green token to that ship.</div></div></td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td><td class="phase-cell empty engagement_phase-engage">&nbsp;</td></tr>
+<tr class="phase-header-row"><td colspan="8" class="phase-header end_phase-start unit-0 unit-1 unit-2 unit-3 unit-4 unit-5 unit-6">End Phase</td></tr>
+<tr><td class="event-label end_phase-start unit-2" rowspan="1">End Phase</td><td class="phase-cell empty end_phase-start">&nbsp;</td><td class="phase-cell empty end_phase-start">&nbsp;</td><td class="phase-cell end_phase-start unit-2"><div class="pilot-block"><div class="upgrade-name"><i class="xwing-miniatures-ship xwing-miniatures-ship-laatigunship" title="LAAT/i Gunship"></i> <strong>“Hawk”</strong></div><div class="ability pilot-ability"><mark>At the start of the End Phase</mark>, each friendly ship at range 0-1 that has a revealed maneuver of speed 3-5 may gain 1 strain token to perform a <i class="xwing-miniatures-font xwing-miniatures-font-barrelroll" title="Barrel Roll"></i> or <i class="xwing-miniatures-font xwing-miniatures-font-boost" title="Boost"></i> action.</div></div></td><td class="phase-cell empty end_phase-start">&nbsp;</td><td class="phase-cell empty end_phase-start">&nbsp;</td><td class="phase-cell empty end_phase-start">&nbsp;</td><td class="phase-cell empty end_phase-start">&nbsp;</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="focusedView">
+  <div id="focusedContainer">
+    <div class="content-wrapper">
+      <div class="table-container">
+        <!-- Table will be moved here dynamically -->
+      </div>
+      <div class="focus-nav-controls">
+        <button onclick="navigateFocus('prev')" id="prevBtn">◀</button>
+        <span id="focusInfo"></span>
+        <button onclick="closeFocusMode()">✕</button>
+        <button onclick="navigateFocus('next')" id="nextBtn">▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Array of all unique game steps from all game phases
+const allGameSteps = ["activation_phase-activation", "engagement_phase-start", "engagement_phase-engage", "end_phase-start"];
+// Array of all unit class names
+const allUnitClasses = ["unit-0", "unit-1", "unit-2", "unit-3", "unit-4", "unit-5", "unit-6"];
+
+let focusMode = false;
+let currentGameStepIndex = 0;
+let currentUnitIndex = 0;
+
+function toggleFocusMode() {
+  if (!focusMode && allGameSteps.length > 0 && allUnitClasses.length > 0) {
+    focusMode = true;
+    currentGameStepIndex = 0;
+    currentUnitIndex = 0;
+    
+    // Move table to focus container table container
+    const mainTable = document.getElementById('mainTable');
+    const tableContainer = document.querySelector('#focusedContainer .table-container');
+    tableContainer.appendChild(mainTable);
+    
+    showGameStepAndUnit(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+    document.getElementById('focusedView').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Enter fullscreen mode
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log('Fullscreen request failed:', err);
+      });
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) {
+      document.documentElement.msRequestFullscreen();
+    }
+    
+    // Adjust navigation controls width to match table
+    setTimeout(() => {
+      const table = document.querySelector('#focusedContainer table');
+      const navControls = document.querySelector('#focusedView .focus-nav-controls');
+      if (table && navControls) {
+        const tableWidth = table.offsetWidth;
+        navControls.style.width = Math.max(tableWidth, 300) + 'px';
+      }
+    }, 100);
+    
+    updateFocusInfo();
+  }
+}
+
+function closeFocusMode() {
+  focusMode = false;
+  
+  // Exit fullscreen mode
+  if (document.exitFullscreen) {
+    document.exitFullscreen().catch(err => {
+      console.log('Exit fullscreen failed:', err);
+    });
+  } else if (document.webkitExitFullscreen) {
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) {
+    document.msExitFullscreen();
+  }
+  
+  // Move table back to original container
+  const mainTable = document.getElementById('mainTable');
+  const tableContainer = document.getElementById('tableContainer');
+  tableContainer.appendChild(mainTable);
+  
+  document.getElementById('focusedView').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  // Show all elements again
+  showAllElements();
+}
+
+function navigateFocus(direction) {
+  if (!focusMode || allGameSteps.length === 0 || allUnitClasses.length === 0) return;
+  
+  // Store the direction for auto-skip logic
+  showGameStepAndUnit._lastDirection = direction;
+  
+  // Check if current game step is engagement phase
+  const currentGameStep = allGameSteps[currentGameStepIndex];
+  const isCurrentEngagementPhase = currentGameStep && currentGameStep.startsWith('engagement_phase-');
+  
+  if (direction === 'next') {
+    if (isCurrentEngagementPhase) {
+      // In engagement phase: navigate units in reverse order (last to first)
+      currentUnitIndex--;
+      if (currentUnitIndex < 0) {
+        // Move to next step
+        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+        const nextGameStep = allGameSteps[currentGameStepIndex];
+        const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+        
+        if (isNextEngagementPhase) {
+          // Next step is also engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        } else {
+          // Next step is not engagement phase: start from first unit
+          currentUnitIndex = 0;
+        }
+      }
+    } else {
+      // Not in engagement phase: navigate units in normal order (first to last)
+      currentUnitIndex++;
+      if (currentUnitIndex >= allUnitClasses.length) {
+        // Move to next step
+        currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+        const nextGameStep = allGameSteps[currentGameStepIndex];
+        const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+        
+        if (isNextEngagementPhase) {
+          // Next step is engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        } else {
+          // Next step is not engagement phase: start from first unit
+          currentUnitIndex = 0;
+        }
+      }
+    }
+  } else if (direction === 'prev') {
+    if (isCurrentEngagementPhase) {
+      // In engagement phase: navigate units in reverse order (when going backwards, go from first to last)
+      currentUnitIndex++;
+      if (currentUnitIndex >= allUnitClasses.length) {
+        // Move to previous step
+        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+        const prevGameStep = allGameSteps[currentGameStepIndex];
+        const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+        
+        if (isPrevEngagementPhase) {
+          // Previous step is also engagement phase: start from first unit
+          currentUnitIndex = 0;
+        } else {
+          // Previous step is not engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        }
+      }
+    } else {
+      // Not in engagement phase: navigate units in normal order (when going backwards, go from last to first)
+      currentUnitIndex--;
+      if (currentUnitIndex < 0) {
+        // Move to previous step
+        currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+        const prevGameStep = allGameSteps[currentGameStepIndex];
+        const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+        
+        if (isPrevEngagementPhase) {
+          // Previous step is engagement phase: start from first unit
+          currentUnitIndex = 0;
+        } else {
+          // Previous step is not engagement phase: start from last unit
+          currentUnitIndex = allUnitClasses.length - 1;
+        }
+      }
+    }
+  }
+  
+  showGameStepAndUnit(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+  
+  // Adjust navigation controls width to match current table content
+  setTimeout(() => {
+    const table = document.querySelector('#focusedContainer table');
+    const navControls = document.querySelector('#focusedView .focus-nav-controls');
+    if (table && navControls) {
+      const tableWidth = table.offsetWidth;
+      navControls.style.width = Math.max(tableWidth, 300) + 'px';
+    }
+  }, 50);
+  
+  updateFocusInfo();
+}
+
+function hasVisibleContent() {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return false;
+  
+  // Get all visible phase-cell elements
+  const visiblePhaseCells = mainTable.querySelectorAll('td.phase-cell:not(.hidden)');
+  
+  // Check if any visible phase-cell does NOT have the 'empty' class
+  for (let cell of visiblePhaseCells) {
+    if (!cell.classList.contains('empty')) {
+      return true; // Found at least one non-empty cell
+    }
+  }
+  
+  return false; // All visible phase-cells are empty
+}
+
+function showGameStepAndUnit(gameStep, unitClass) {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return;
+  
+  // Get all th and td elements
+  const allCells = mainTable.querySelectorAll('th, td');
+  
+  // Hide all cells first
+  allCells.forEach(cell => {
+    cell.classList.add('hidden');
+  });
+  
+  // Show cells that have both the current game step and unit class in their class attribute
+  allCells.forEach(cell => {
+    if (cell.classList.contains(gameStep) && cell.classList.contains(unitClass)) {
+      cell.classList.remove('hidden');
+    }
+  });
+  
+  // Check if all visible phase-cells are empty and auto-skip if needed
+  if (!hasVisibleContent()) {
+    // Use a flag to prevent infinite recursion
+    if (!showGameStepAndUnit._isAutoSkipping) {
+      showGameStepAndUnit._isAutoSkipping = true;
+      // Determine direction based on last navigation (default to next)
+      const direction = showGameStepAndUnit._lastDirection || 'next';
+      autoSkipToNextContent(direction);
+      showGameStepAndUnit._isAutoSkipping = false;
+    }
+  }
+}
+
+function autoSkipToNextContent(direction) {
+  if (!focusMode || allGameSteps.length === 0 || allUnitClasses.length === 0) return;
+  
+  const maxAttempts = allGameSteps.length * allUnitClasses.length;
+  let attempts = 0;
+  
+  // Keep trying to find content until we find some or exhaust all possibilities
+  while (attempts < maxAttempts) {
+    attempts++;
+    
+    // Use the same navigation logic as navigateFocus to respect engagement phase rules
+    const currentGameStep = allGameSteps[currentGameStepIndex];
+    const isCurrentEngagementPhase = currentGameStep && currentGameStep.startsWith('engagement_phase-');
+    
+    if (direction === 'next') {
+      if (isCurrentEngagementPhase) {
+        // In engagement phase: navigate units in reverse order (last to first)
+        currentUnitIndex--;
+        if (currentUnitIndex < 0) {
+          // Move to next step
+          currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+          const nextGameStep = allGameSteps[currentGameStepIndex];
+          const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+          
+          if (isNextEngagementPhase) {
+            // Next step is also engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          } else {
+            // Next step is not engagement phase: start from first unit
+            currentUnitIndex = 0;
+          }
+        }
+      } else {
+        // Not in engagement phase: navigate units in normal order (first to last)
+        currentUnitIndex++;
+        if (currentUnitIndex >= allUnitClasses.length) {
+          // Move to next step
+          currentGameStepIndex = (currentGameStepIndex + 1) % allGameSteps.length;
+          const nextGameStep = allGameSteps[currentGameStepIndex];
+          const isNextEngagementPhase = nextGameStep && nextGameStep.startsWith('engagement_phase-');
+          
+          if (isNextEngagementPhase) {
+            // Next step is engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          } else {
+            // Next step is not engagement phase: start from first unit
+            currentUnitIndex = 0;
+          }
+        }
+      }
+    } else if (direction === 'prev') {
+      if (isCurrentEngagementPhase) {
+        // In engagement phase: navigate units in reverse order (when going backwards, go from first to last)
+        currentUnitIndex++;
+        if (currentUnitIndex >= allUnitClasses.length) {
+          // Move to previous step
+          currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+          const prevGameStep = allGameSteps[currentGameStepIndex];
+          const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+          
+          if (isPrevEngagementPhase) {
+            // Previous step is also engagement phase: start from first unit
+            currentUnitIndex = 0;
+          } else {
+            // Previous step is not engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          }
+        }
+      } else {
+        // Not in engagement phase: navigate units in normal order (when going backwards, go from last to first)
+        currentUnitIndex--;
+        if (currentUnitIndex < 0) {
+          // Move to previous step
+          currentGameStepIndex = currentGameStepIndex > 0 ? currentGameStepIndex - 1 : allGameSteps.length - 1;
+          const prevGameStep = allGameSteps[currentGameStepIndex];
+          const isPrevEngagementPhase = prevGameStep && prevGameStep.startsWith('engagement_phase-');
+          
+          if (isPrevEngagementPhase) {
+            // Previous step is engagement phase: start from first unit
+            currentUnitIndex = 0;
+          } else {
+            // Previous step is not engagement phase: start from last unit
+            currentUnitIndex = allUnitClasses.length - 1;
+          }
+        }
+      }
+    }
+    
+    // Show the new combination without auto-skipping (to avoid recursion)
+    showGameStepAndUnitWithoutAutoSkip(allGameSteps[currentGameStepIndex], allUnitClasses[currentUnitIndex]);
+    
+    // Check if this combination has content
+    if (hasVisibleContent()) {
+      updateFocusInfo();
+      return; // Found content, stop searching
+    }
+  }
+  
+  // If we get here, no content was found in any combination
+  updateFocusInfo();
+}
+
+function showGameStepAndUnitWithoutAutoSkip(gameStep, unitClass) {
+  const mainTable = document.getElementById('mainTable');
+  if (!mainTable) return;
+  
+  // Get all th and td elements
+  const allCells = mainTable.querySelectorAll('th, td');
+  
+  // Hide all cells first
+  allCells.forEach(cell => {
+    cell.classList.add('hidden');
+  });
+  
+  // Show cells that have both the current game step and unit class in their class attribute
+  allCells.forEach(cell => {
+    if (cell.classList.contains(gameStep) && cell.classList.contains(unitClass)) {
+      cell.classList.remove('hidden');
+    }
+  });
+}
+
+function showAllElements() {
+  const mainTable = document.querySelector('#mainTable');
+  if (!mainTable) return;
+  
+  // Remove hidden class from all elements
+  const hiddenElements = mainTable.querySelectorAll('.hidden');
+  hiddenElements.forEach(element => {
+    element.classList.remove('hidden');
+  });
+}
+
+function updateFocusInfo() {
+  const focusInfo = document.getElementById('focusInfo');
+  if (focusInfo && allGameSteps.length > 0 && allUnitClasses.length > 0) {
+    const currentStep = allGameSteps[currentGameStepIndex];
+    const currentUnit = allUnitClasses[currentUnitIndex];
+    const stepDisplay = currentStep.replace(/_/g, ' ').replace(/-/g, ' → ');
+    const totalCombinations = allGameSteps.length * allUnitClasses.length;
+    const currentCombination = (currentGameStepIndex * allUnitClasses.length) + currentUnitIndex + 1;
+    focusInfo.textContent = `${currentCombination}/${totalCombinations}: ${stepDisplay} (${currentUnit})`;
+  }
+  
+  // Update button states
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  if (prevBtn) prevBtn.disabled = false;
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+// Handle keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (!focusMode) return;
+  
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    navigateFocus('next');
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    navigateFocus('prev');
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    closeFocusMode();
+  }
+});
+</script>
+</body>
+</html>
