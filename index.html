@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-Wing TMG Squad Lists</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .faction-section {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .faction-header {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .faction-header:hover {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+        }
+        
+        .faction-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+        
+        .faction-toggle {
+            margin-left: auto;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        
+        .faction-content {
+            padding: 20px;
+            background: #fff;
+            display: none;
+        }
+        
+        .faction-content.expanded {
+            display: block;
+        }
+        
+        .squad-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .squad-item {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .squad-item:hover {
+            background: #e9ecef;
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .squad-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .squad-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stats {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .stats-item {
+            display: inline-block;
+            margin: 0 20px;
+            color: #0c5460;
+        }
+        
+        .stats-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        /* Faction-specific colors */
+        .rebel-alliance .faction-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        .rebel-alliance .faction-header:hover {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+        
+        .galactic-empire .faction-header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+        }
+        
+        .first-order .faction-header {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        }
+        .first-order .faction-header:hover {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .resistance .faction-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        .resistance .faction-header:hover {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+        }
+        
+        .scum-and-villainy .faction-header {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+        .scum-and-villainy .faction-header:hover {
+            background: linear-gradient(135deg, #229954, #27ae60);
+        }
+        
+        .galactic-republic .faction-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        .galactic-republic .faction-header:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+        }
+        
+        .separatist-alliance .faction-header {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+        .separatist-alliance .faction-header:hover {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .squad-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-item {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 X-Wing TMG Squad Lists</h1>
+        <p class="subtitle">Interactive cheat sheets for X-Wing: The Miniatures Game squad lists</p>
+        
+        <div class="stats" id="stats">
+            <div class="loading">Loading statistics...</div>
+        </div>
+        
+        <div id="content">
+            <div class="loading">
+                <div>🔍 Scanning for squad lists...</div>
+                <div style="margin-top: 10px; font-size: 0.9em;">Discovering factions and squads in the lists directory</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Faction display names and icons
+        const factionInfo = {
+            'rebel-alliance': { 
+                name: 'Rebel Alliance', 
+                icon: '🔴',
+                description: 'Fighting for freedom across the galaxy'
+            },
+            'galactic-empire': { 
+                name: 'Galactic Empire', 
+                icon: '⚫',
+                description: 'Order through superior firepower'
+            },
+            'first-order': { 
+                name: 'First Order', 
+                icon: '🔺',
+                description: 'The dark side rises again'
+            },
+            'resistance': { 
+                name: 'Resistance', 
+                icon: '🟠',
+                description: 'Hope in the face of tyranny'
+            },
+            'scum-and-villainy': { 
+                name: 'Scum and Villainy', 
+                icon: '🟢',
+                description: 'Credits and chaos in equal measure'
+            },
+            'galactic-republic': { 
+                name: 'Galactic Republic', 
+                icon: '🔵',
+                description: 'Democracy defended by the Jedi'
+            },
+            'separatist-alliance': { 
+                name: 'Separatist Alliance', 
+                icon: '🔘',
+                description: 'Droid armies and corporate interests'
+            }
+        };
+
+        // Function to toggle faction visibility
+        function toggleFaction(factionId) {
+            const content = document.getElementById(`faction-${factionId}-content`);
+            const toggle = document.getElementById(`faction-${factionId}-toggle`);
+            
+            if (content && toggle) {
+                const isExpanded = content.classList.contains('expanded');
+                content.classList.toggle('expanded');
+                toggle.textContent = isExpanded ? '▼' : '▲';
+                
+                // Save state to localStorage
+                localStorage.setItem(`faction-${factionId}-expanded`, !isExpanded);
+            }
+        }
+
+        // Function to restore saved expansion states
+        function restoreExpansionStates() {
+            Object.keys(factionInfo).forEach(factionId => {
+                const isExpanded = localStorage.getItem(`faction-${factionId}-expanded`) === 'true';
+                if (isExpanded) {
+                    const content = document.getElementById(`faction-${factionId}-content`);
+                    const toggle = document.getElementById(`faction-${factionId}-toggle`);
+                    if (content && toggle) {
+                        content.classList.add('expanded');
+                        toggle.textContent = '▲';
+                    }
+                }
+            });
+        }
+
+        // Function to generate squad list HTML
+        function generateSquadList(squads) {
+            if (!squads || squads.length === 0) {
+                return '<div style="color: #6c757d; font-style: italic; padding: 20px; text-align: center;">No squad lists found in this faction</div>';
+            }
+
+            return `
+                <div class="squad-list">
+                    ${squads.map(squad => `
+                        <a href="lists/${squad.faction}/${squad.filename}" class="squad-item">
+                            <div class="squad-name">${squad.name || squad.filename.replace('.html', '')}</div>
+                            <div class="squad-meta">
+                                <span>📄 ${squad.filename}</span>
+                                <span>🎯 Squad List</span>
+                            </div>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Function to load and display faction data
+        async function loadFactionData() {
+            try {
+                // Try to load the generated index file
+                const response = await fetch('squad-index.json');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayFactionData(data);
+                } else {
+                    // Fallback if index file doesn't exist yet
+                    const fallbackData = {
+                        stats: {
+                            totalSquads: 0,
+                            totalFactions: 0,
+                            lastUpdated: new Date().toLocaleDateString()
+                        },
+                        factions: {}
+                    };
+                    displayFactionData(fallbackData);
+                }
+                
+            } catch (error) {
+                console.error('Error loading faction data:', error);
+                
+                // Show helpful error message
+                document.getElementById('content').innerHTML = `
+                    <div class="error">
+                        <strong>Squad index not found</strong>
+                        <br><br>
+                        To populate this page with your squad lists:
+                        <ol style="text-align: left; margin-top: 15px;">
+                            <li>Run the PowerShell script: <code>process-all-lists.ps1</code></li>
+                            <li>This will process all JSON files and generate HTML cheat sheets</li>
+                            <li>The script will also create a <code>squad-index.json</code> file</li>
+                            <li>Refresh this page to see your squad lists</li>
+                        </ol>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to display faction data
+        function displayFactionData(data) {
+            // Update stats
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = `
+                <div class="stats-item">
+                    <span class="stats-number">${data.stats.totalSquads}</span>
+                    <span>Squad Lists</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-number">${data.stats.totalFactions}</span>
+                    <span>Factions</span>
+                </div>
+                <div class="stats-item">
+                    <span class="stats-number">${data.stats.lastUpdated}</span>
+                    <span>Last Updated</span>
+                </div>
+            `;
+
+            // Generate faction sections
+            const contentDiv = document.getElementById('content');
+            
+            if (data.stats.totalSquads === 0) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        <h3>📋 Getting Started</h3>
+                        <p>No squad lists found yet. To populate this index:</p>
+                        <ol style="text-align: left; display: inline-block; margin-top: 20px;">
+                            <li>Place your X-Wing squad JSON files in the <code>lists/[faction-name]/</code> directories</li>
+                            <li>Run your PowerShell build script to generate HTML cheat sheets</li>
+                            <li>The HTML files will appear here automatically</li>
+                        </ol>
+                        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px; font-size: 0.9em;">
+                            <strong>Expected structure:</strong><br>
+                            <code>lists/rebel-alliance/*.html</code><br>
+                            <code>lists/galactic-empire/*.html</code><br>
+                            <code>lists/first-order/*.html</code><br>
+                            <em>...and so on</em>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const factionsHtml = Object.keys(factionInfo)
+                .filter(factionId => data.factions[factionId] && data.factions[factionId].length > 0)
+                .map(factionId => {
+                    const faction = factionInfo[factionId];
+                    const squads = data.factions[factionId];
+                    
+                    return `
+                        <div class="faction-section ${factionId}">
+                            <div class="faction-header" onclick="toggleFaction('${factionId}')">
+                                <span class="faction-icon">${faction.icon}</span>
+                                <div>
+                                    <div>${faction.name}</div>
+                                    <div style="font-size: 0.8em; opacity: 0.9; font-weight: normal;">${squads.length} squad${squads.length !== 1 ? 's' : ''} • ${faction.description}</div>
+                                </div>
+                                <span class="faction-toggle" id="faction-${factionId}-toggle">▼</span>
+                            </div>
+                            <div class="faction-content" id="faction-${factionId}-content">
+                                ${generateSquadList(squads)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            contentDiv.innerHTML = factionsHtml || `
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <p>No squad lists found in any faction directories.</p>
+                </div>
+            `;
+
+            // Restore expansion states after a brief delay to ensure DOM is ready
+            setTimeout(restoreExpansionStates, 100);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', loadFactionData);
+    </script>
+</body>
+</html>
