@@ -4,7 +4,7 @@
       {
         "faction": "galactic-republic",
         "name": "New Squadron",
-        "lastModified": "2025-10-08 09:48:59",
+        "lastModified": "2025-10-09 11:53:37",
         "filename": "andrey.html"
       }
     ],
@@ -12,7 +12,7 @@
       {
         "faction": "scum-and-villainy",
         "name": "Front and Personal Bombs",
-        "lastModified": "2025-10-08 09:49:00",
+        "lastModified": "2025-10-09 11:53:38",
         "filename": "front-and-personal-bombs.html"
       }
     ],
@@ -20,14 +20,14 @@
       {
         "faction": "resistance",
         "name": "Poe Smack Down",
-        "lastModified": "2025-10-08 09:49:00",
+        "lastModified": "2025-10-09 11:53:38",
         "filename": "resistance-poe-smack-down.html"
       }
     ]
   },
   "stats": {
     "totalSquads": 3,
-    "lastUpdated": "2025-10-08 09:49:00",
+    "lastUpdated": "2025-10-09 11:53:38",
     "totalFactions": 3
   }
 }
