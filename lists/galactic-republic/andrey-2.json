@@ -1,0 +1,84 @@
+{
+  "name": "New Squadron",
+  "description": "",
+  "faction": "galacticrepublic",
+  "ruleset": "xwa",
+  "points": 20,
+  "version": "2.56.29",
+  "obstacles": [],
+  "pilots": [
+    {
+      "id": "hawk",
+      "ship": "laatigunship",
+      "points": 5,
+      "upgrades": {
+        "talent": [
+          "squadleader"
+        ],
+        "crew": [
+          "tacticalofficer",
+          "ghostcompany"
+        ],
+        "gunner": [
+          "clonecommandercody"
+        ]
+      }
+    },
+    {
+      "id": "ricolie",
+      "ship": "nabooroyaln1starfighter",
+      "points": 4,
+      "upgrades": {
+        "talent": [
+          "juke",
+          "enduring"
+        ]
+      }
+    },
+    {
+      "id": "tucker",
+      "ship": "v19torrentstarfighter",
+      "points": 3,
+      "upgrades": {
+        "missile": [
+          "barragerockets"
+        ],
+        "talent": [
+          "dedicated"
+        ]
+      }
+    },
+    {
+      "id": "wolffe-siegeofcoruscant",
+      "ship": "arc170starfighter",
+      "points": 5,
+      "upgrades": {}
+    },
+    {
+      "id": "axe",
+      "ship": "v19torrentstarfighter",
+      "points": 3,
+      "upgrades": {
+        "talent": [
+          "dedicated"
+        ],
+        "missile": [
+          "protonrockets"
+        ]
+      }
+    }
+  ],
+  "vendor": {
+    "lbn": {
+      "builder": "Launch Bay Next",
+      "builder_url": "https://launchbaynext.app",
+      "link": "https://launchbaynext.app/print?lbx='New%20Squadron'.20.6.0.1.ll74.660.l8.277.681r.l16.552r.l1.245rr.l66.557.l1.237.1034rr.l62.520.l6.265r.l1.544rr.l31.972r.l62.518.l6.270r.l1.544rrr.lr",
+      "uid": "1f122e1c-485e-40e4-9a89-089c0aa536cf",
+      "wins": 0,
+      "ties": 0,
+      "losses": 0,
+      "tags": [],
+      "created": "2025-09-17T08:47:02.253Z"
+    }
+  }
+}

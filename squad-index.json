@@ -1,33 +1,39 @@
 {
+  "stats": {
+    "totalSquads": 4,
+    "lastUpdated": "2025-10-16 14:40:20",
+    "totalFactions": 3
+  },
   "factions": {
     "galactic-republic": [
       {
         "faction": "galactic-republic",
+        "filename": "andrey-2.html",
         "name": "New Squadron",
-        "lastModified": "2025-10-09 18:16:23",
-        "filename": "andrey.html"
+        "lastModified": "2025-10-16 14:40:18"
+      },
+      {
+        "faction": "galactic-republic",
+        "filename": "andrey.html",
+        "name": "New Squadron",
+        "lastModified": "2025-10-16 14:40:19"
       }
     ],
     "scum-and-villainy": [
       {
         "faction": "scum-and-villainy",
+        "filename": "front-and-personal-bombs.html",
         "name": "Front and Personal Bombs",
-        "lastModified": "2025-10-09 18:16:24",
-        "filename": "front-and-personal-bombs.html"
+        "lastModified": "2025-10-16 14:40:20"
       }
     ],
     "resistance": [
       {
         "faction": "resistance",
+        "filename": "resistance-poe-smack-down.html",
         "name": "Poe Smack Down",
-        "lastModified": "2025-10-09 18:16:23",
-        "filename": "resistance-poe-smack-down.html"
+        "lastModified": "2025-10-16 14:40:19"
       }
     ]
-  },
-  "stats": {
-    "totalSquads": 3,
-    "lastUpdated": "2025-10-09 18:16:24",
-    "totalFactions": 3
   }
 }
