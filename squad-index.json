@@ -1,39 +1,45 @@
 {
-  "stats": {
-    "totalSquads": 4,
-    "lastUpdated": "2025-10-16 14:40:20",
-    "totalFactions": 3
-  },
   "factions": {
-    "galactic-republic": [
+    "resistance": [
       {
-        "faction": "galactic-republic",
-        "filename": "andrey-2.html",
-        "name": "New Squadron",
-        "lastModified": "2025-10-16 14:40:18"
-      },
-      {
-        "faction": "galactic-republic",
-        "filename": "andrey.html",
-        "name": "New Squadron",
-        "lastModified": "2025-10-16 14:40:19"
+        "name": "Poe Smack Down",
+        "filename": "resistance-poe-smack-down.html",
+        "lastModified": "2025-10-17 22:05:12",
+        "faction": "resistance"
       }
     ],
     "scum-and-villainy": [
       {
-        "faction": "scum-and-villainy",
-        "filename": "front-and-personal-bombs.html",
         "name": "Front and Personal Bombs",
-        "lastModified": "2025-10-16 14:40:20"
+        "filename": "front-and-personal-bombs.html",
+        "lastModified": "2025-10-17 22:05:12",
+        "faction": "scum-and-villainy"
+      },
+      {
+        "name": "Front and Personal v2",
+        "filename": "front-and-personal-v2.html",
+        "lastModified": "2025-10-17 22:05:12",
+        "faction": "scum-and-villainy"
       }
     ],
-    "resistance": [
+    "galactic-republic": [
       {
-        "faction": "resistance",
-        "filename": "resistance-poe-smack-down.html",
-        "name": "Poe Smack Down",
-        "lastModified": "2025-10-16 14:40:19"
+        "name": "New Squadron",
+        "filename": "andrey-2.html",
+        "lastModified": "2025-10-17 22:05:11",
+        "faction": "galactic-republic"
+      },
+      {
+        "name": "New Squadron",
+        "filename": "andrey.html",
+        "lastModified": "2025-10-17 22:05:12",
+        "faction": "galactic-republic"
       }
     ]
+  },
+  "stats": {
+    "lastUpdated": "2025-10-17 22:05:12",
+    "totalFactions": 3,
+    "totalSquads": 5
   }
 }

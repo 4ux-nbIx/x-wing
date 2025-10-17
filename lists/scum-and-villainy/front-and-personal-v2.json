@@ -1,0 +1,76 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Front and Personal v2",
+  "pilots": [
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 6,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "talent": [
+          "predator"
+        ],
+        "crew": [
+          "qira"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "fennrau",
+      "name": "fennrau",
+      "points": 5,
+      "ship": "fangfighter",
+      "upgrades": {
+        "talent": [
+          "fearless"
+        ]
+      }
+    },
+    {
+      "id": "guri",
+      "name": "guri",
+      "points": 5,
+      "ship": "starviperclassattackplatform",
+      "upgrades": {
+        "talent": [
+          "marksmanship"
+        ],
+        "tech": [
+          "primedthrusters"
+        ]
+      }
+    },
+    {
+      "id": "talonbanecobra",
+      "name": "talonbanecobra",
+      "points": 4,
+      "ship": "kihraxzfighter",
+      "upgrades": {
+        "talent": [
+          "trickshot"
+        ]
+      }
+    }
+  ],
+  "points": 20,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v9ZbZ20Z126X127W55W92WW446W160Y97X121WWWWY147X125W178WWWWY119X133WWWWW&sn=Front%20and%20Personal%20v2&obs="
+    }
+  },
+  "version": "R2",
+  "ruleset": "XWA"
+}
