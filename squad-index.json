@@ -1,45 +1,57 @@
 {
   "factions": {
-    "resistance": [
-      {
-        "name": "Poe Smack Down",
-        "filename": "resistance-poe-smack-down.html",
-        "lastModified": "2025-10-17 22:05:12",
-        "faction": "resistance"
-      }
-    ],
     "scum-and-villainy": [
       {
         "name": "Front and Personal Bombs",
         "filename": "front-and-personal-bombs.html",
-        "lastModified": "2025-10-17 22:05:12",
-        "faction": "scum-and-villainy"
+        "faction": "scum-and-villainy",
+        "lastModified": "2025-11-05 09:08:52"
+      },
+      {
+        "name": "Front and Personal Latest XWA Fenn Ketsu Cad",
+        "filename": "front-and-personal-fenn-cad.html",
+        "faction": "scum-and-villainy",
+        "lastModified": "2025-11-05 09:08:53"
       },
       {
         "name": "Front and Personal v2",
         "filename": "front-and-personal-v2.html",
-        "lastModified": "2025-10-17 22:05:12",
-        "faction": "scum-and-villainy"
+        "faction": "scum-and-villainy",
+        "lastModified": "2025-11-05 09:08:53"
+      },
+      {
+        "name": "Ketsu, Fenn, Mando with jabbulators",
+        "filename": "jabbulators-on-mando-ketsu-fenn.html",
+        "faction": "scum-and-villainy",
+        "lastModified": "2025-11-05 09:08:54"
       }
     ],
     "galactic-republic": [
       {
         "name": "New Squadron",
         "filename": "andrey-2.html",
-        "lastModified": "2025-10-17 22:05:11",
-        "faction": "galactic-republic"
+        "faction": "galactic-republic",
+        "lastModified": "2025-11-05 09:08:50"
       },
       {
         "name": "New Squadron",
         "filename": "andrey.html",
-        "lastModified": "2025-10-17 22:05:12",
-        "faction": "galactic-republic"
+        "faction": "galactic-republic",
+        "lastModified": "2025-11-05 09:08:51"
+      }
+    ],
+    "resistance": [
+      {
+        "name": "Poe Smack Down",
+        "filename": "resistance-poe-smack-down.html",
+        "faction": "resistance",
+        "lastModified": "2025-11-05 09:08:51"
       }
     ]
   },
   "stats": {
-    "lastUpdated": "2025-10-17 22:05:12",
+    "totalSquads": 7,
     "totalFactions": 3,
-    "totalSquads": 5
+    "lastUpdated": "2025-11-05 09:08:54"
   }
 }

@@ -1,0 +1,83 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Ketsu, Fenn, Mando with jabbulators",
+  "pilots": [
+    {
+      "id": "themandalorian",
+      "name": "themandalorian",
+      "points": 16,
+      "ship": "st70assaultship",
+      "upgrades": {
+        "crew": [
+          "jabbathehutt"
+        ],
+        "illicit": [
+          "overtunedmodulators"
+        ],
+        "modification": [
+          "electronicbaffle"
+        ],
+        "title": [
+          "razorcrest"
+        ]
+      }
+    },
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 16,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "talent": [
+          "fearless"
+        ],
+        "crew": [
+          "perceptivecopilot"
+        ],
+        "illicit": [
+          "hotshottailblaster"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "fennrau",
+      "name": "fennrau",
+      "points": 13,
+      "ship": "fangfighter",
+      "upgrades": {
+        "talent": [
+          "marksmanship",
+          "fearless"
+        ]
+      }
+    },
+    {
+      "id": "miningguildsentry",
+      "name": "miningguildsentry",
+      "points": 5,
+      "ship": "modifiedtielnfighter",
+      "upgrades": {
+        "modification": [
+          "precisionionengines"
+        ]
+      }
+    }
+  ],
+  "points": 50,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5 XWA",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v10ZsZ50Z522XW39WW411WW106W451Y126X121W54W463WW446W160Y97X125W121WWWY304X338W&sn=Ketsu%2C%20Fenn%2C%20Mando%20with%20jabbulators&obs="
+    }
+  },
+  "version": "50P-1.0",
+  "ruleset": "XWA"
+}

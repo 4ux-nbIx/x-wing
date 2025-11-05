@@ -1,0 +1,88 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Front and Personal Latest XWA Fenn Ketsu Cad",
+  "pilots": [
+    {
+      "id": "fennrau",
+      "name": "fennrau",
+      "points": 13,
+      "ship": "fangfighter",
+      "upgrades": {
+        "talent": [
+          "fearless",
+          "marksmanship"
+        ]
+      }
+    },
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 16,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "talent": [
+          "notorious"
+        ],
+        "crew": [
+          "qira"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "cadbane",
+      "name": "cadbane",
+      "points": 12,
+      "ship": "rogueclassstarfighter",
+      "upgrades": {
+        "cannon": [
+          "syncedlasercannons"
+        ],
+        "missile": [
+          "protonrockets"
+        ],
+        "title": [
+          "xanadublood"
+        ],
+        "crew": [
+          "zuckuss"
+        ]
+      }
+    },
+    {
+      "id": "kananjarrus-hwk290lightfreighter",
+      "name": "kananjarrus-hwk290lightfreighter",
+      "points": 9,
+      "ship": "hwk290lightfreighter",
+      "upgrades": {
+        "crew": [
+          "greefkarga"
+        ]
+      }
+    }
+  ],
+  "points": 50,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5 XWA",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v10ZsZ50Z97X121W125WWWY126X455W55W92WW446W160Y534XW354WW102WWWW472W66WY457XW458WWW&sn=Front%20and%20Personal%20Latest%20XWA%20Fenn%20Ketsu%20Cad&obs=core2asteroid2,coreasteroid0,coreasteroid2"
+    }
+  },
+  "version": "50P-1.0",
+  "ruleset": "XWA",
+  "obstacles": [
+    "core2asteroid2",
+    "coreasteroid0",
+    "coreasteroid2"
+  ]
+}
