@@ -1,0 +1,115 @@
+{
+  "description": "",
+  "faction": "resistance",
+  "name": "A Falcon and A Bunch of A Wings",
+  "pilots": [
+    {
+      "id": "chewbacca-scavengedyt1300",
+      "name": "chewbacca-scavengedyt1300",
+      "points": 17,
+      "ship": "scavengedyt1300",
+      "upgrades": {
+        "crew": [
+          "leiaorgana-resistance"
+        ],
+        "gunner": [
+          "agilegunner"
+        ],
+        "illicit": [
+          "hotshottailblaster"
+        ],
+        "modification": [
+          "engineupgrade"
+        ],
+        "title": [
+          "reysmillenniumfalcon"
+        ]
+      }
+    },
+    {
+      "id": "tezanasz",
+      "name": "tezanasz",
+      "points": 8,
+      "ship": "btanr2ywing",
+      "upgrades": {
+        "turret": [
+          "dorsalturret"
+        ],
+        "device": [
+          "seismiccharges"
+        ],
+        "modification": [
+          "engineupgrade",
+          "targetingcomputer"
+        ]
+      }
+    },
+    {
+      "id": "shasazaro",
+      "name": "shasazaro",
+      "points": 9,
+      "ship": "btanr2ywing",
+      "upgrades": {
+        "talent": [
+          "experthandling"
+        ],
+        "turret": [
+          "dorsalturret"
+        ],
+        "device": [
+          "protonbombs"
+        ],
+        "modification": [
+          "targetingcomputer",
+          "engineupgrade"
+        ]
+      }
+    },
+    {
+      "id": "legafossang",
+      "name": "legafossang",
+      "points": 8,
+      "ship": "btanr2ywing",
+      "upgrades": {
+        "turret": [
+          "dorsalturret"
+        ],
+        "astromech": [
+          "watchfulastromech"
+        ],
+        "modification": [
+          "targetingcomputer",
+          "engineupgrade"
+        ]
+      }
+    },
+    {
+      "id": "wilsateshlo",
+      "name": "wilsateshlo",
+      "points": 8,
+      "ship": "btanr2ywing",
+      "upgrades": {
+        "talent": [
+          "tierfonbellyrun"
+        ],
+        "turret": [
+          "dorsalturret"
+        ],
+        "modification": [
+          "targetingcomputer",
+          "engineupgrade"
+        ]
+      }
+    }
+  ],
+  "points": 50,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5 XWA",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Resistance&d=v10ZsZ50Z246XWW244WW76WW463WW107W193Y478XWW137WW71W107W249Y480X120WW137WW69W249W107Y481XW137W410WW249W107Y479X376WW137WWW249W107&sn=A%20Falcon%20and%20A%20Bunch%20of%20A%20Wings&obs="
+    }
+  },
+  "version": "50P-1.0",
+  "ruleset": "XWA"
+}

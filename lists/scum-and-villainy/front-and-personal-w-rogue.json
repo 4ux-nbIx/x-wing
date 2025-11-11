@@ -1,0 +1,79 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Front and Personal w/ Rogue",
+  "pilots": [
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 16,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "talent": [
+          "notorious"
+        ],
+        "crew": [
+          "qira"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "guri",
+      "name": "guri",
+      "points": 13,
+      "ship": "starviperclassattackplatform",
+      "upgrades": {
+        "talent": [
+          "outmaneuver"
+        ],
+        "sensor": [
+          "firecontrolsystem"
+        ]
+      }
+    },
+    {
+      "id": "talonbanecobra",
+      "name": "talonbanecobra",
+      "points": 12,
+      "ship": "kihraxzfighter",
+      "upgrades": {
+        "talent": [
+          "outmaneuver"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ]
+      }
+    },
+    {
+      "id": "outerrimhunter",
+      "name": "outerrimhunter",
+      "points": 9,
+      "ship": "rogueclassstarfighter",
+      "upgrades": {
+        "cannon": [
+          "autoblasters"
+        ]
+      }
+    }
+  ],
+  "points": 50,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5 XWA",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v10ZsZ50Z126X455W55W92WW446W160Y147X126W113WWWWY119X126WW92WWWY537X232WWWW&sn=Front%20and%20Personal%20w%2F%20Rogue&obs="
+    }
+  },
+  "version": "50P-1.0",
+  "ruleset": "XWA"
+}
