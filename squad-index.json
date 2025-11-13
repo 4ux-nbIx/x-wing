@@ -1,7 +1,7 @@
 {
   "stats": {
-    "totalSquads": 9,
-    "lastUpdated": "2025-11-11 20:28:46",
+    "totalSquads": 10,
+    "lastUpdated": "2025-11-13 08:50:19",
     "totalFactions": 3
   },
   "factions": {
@@ -10,13 +10,13 @@
         "filename": "andrey-2.html",
         "faction": "galactic-republic",
         "name": "New Squadron",
-        "lastModified": "2025-11-11 20:28:36"
+        "lastModified": "2025-11-13 08:50:13"
       },
       {
         "filename": "andrey.html",
         "faction": "galactic-republic",
         "name": "New Squadron",
-        "lastModified": "2025-11-11 20:28:37"
+        "lastModified": "2025-11-13 08:50:14"
       }
     ],
     "scum-and-villainy": [
@@ -24,31 +24,37 @@
         "filename": "front-and-personal-bombs.html",
         "faction": "scum-and-villainy",
         "name": "Front and Personal Bombs",
-        "lastModified": "2025-11-11 20:28:41"
+        "lastModified": "2025-11-13 08:50:16"
       },
       {
         "filename": "front-and-personal-fenn-cad.html",
         "faction": "scum-and-villainy",
         "name": "Front and Personal Latest XWA Fenn Ketsu Cad",
-        "lastModified": "2025-11-11 20:28:42"
+        "lastModified": "2025-11-13 08:50:17"
+      },
+      {
+        "filename": "front-and-personal-pomerania.html",
+        "faction": "scum-and-villainy",
+        "name": "Front and Personal Pomerania",
+        "lastModified": "2025-11-13 08:50:17"
       },
       {
         "filename": "front-and-personal-v2.html",
         "faction": "scum-and-villainy",
         "name": "Front and Personal v2",
-        "lastModified": "2025-11-11 20:28:44"
+        "lastModified": "2025-11-13 08:50:18"
       },
       {
         "filename": "front-and-personal-w-rogue.html",
         "faction": "scum-and-villainy",
         "name": "Front and Personal w/ Rogue",
-        "lastModified": "2025-11-11 20:28:45"
+        "lastModified": "2025-11-13 08:50:19"
       },
       {
         "filename": "jabbulators-on-mando-ketsu-fenn.html",
         "faction": "scum-and-villainy",
         "name": "Ketsu, Fenn, Mando with jabbulators",
-        "lastModified": "2025-11-11 20:28:46"
+        "lastModified": "2025-11-13 08:50:19"
       }
     ],
     "resistance": [
@@ -56,13 +62,13 @@
         "filename": "resistance-chew-y-wings.html",
         "faction": "resistance",
         "name": "A Falcon and A Bunch of A Wings",
-        "lastModified": "2025-11-11 20:28:39"
+        "lastModified": "2025-11-13 08:50:15"
       },
       {
         "filename": "resistance-poe-smack-down.html",
         "faction": "resistance",
         "name": "Poe Smack Down",
-        "lastModified": "2025-11-11 20:28:40"
+        "lastModified": "2025-11-13 08:50:16"
       }
     ]
   }

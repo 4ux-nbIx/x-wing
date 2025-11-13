@@ -1,0 +1,82 @@
+{
+  "description": "",
+  "faction": "scumandvillainy",
+  "name": "Front and Personal Pomerania",
+  "pilots": [
+    {
+      "id": "ketsuonyo",
+      "name": "ketsuonyo",
+      "points": 16,
+      "ship": "lancerclasspursuitcraft",
+      "upgrades": {
+        "crew": [
+          "qira"
+        ],
+        "illicit": [
+          "contrabandcybernetics"
+        ],
+        "modification": [
+          "mandalorianoptics"
+        ],
+        "title": [
+          "shadowcaster"
+        ]
+      }
+    },
+    {
+      "id": "guri",
+      "name": "guri",
+      "points": 13,
+      "ship": "starviperclassattackplatform",
+      "upgrades": {
+        "talent": [
+          "predator"
+        ],
+        "title": [
+          "virago"
+        ]
+      }
+    },
+    {
+      "id": "talonbanecobra",
+      "name": "talonbanecobra",
+      "points": 12,
+      "ship": "kihraxzfighter",
+      "upgrades": {
+        "talent": [
+          "fearless"
+        ],
+        "modification": [
+          "electronicbaffle",
+          "afterburners"
+        ]
+      }
+    },
+    {
+      "id": "outerrimhunter",
+      "name": "outerrimhunter",
+      "points": 9,
+      "ship": "rogueclassstarfighter",
+      "upgrades": {
+        "cannon": [
+          "autoblasters"
+        ]
+      }
+    }
+  ],
+  "points": 50,
+  "vendor": {
+    "yasb": {
+      "builder": "YASB - X-Wing 2.5 XWA",
+      "builder_url": "https://yasb.app/",
+      "link": "https://yasb.app/?f=Scum%20and%20Villainy&d=v10ZsZ50Z126XW55W92WW446W160Y147X127WWWWW163WY119X121WWWW106W105Y537X232WWWW&sn=Front%20and%20Personal%20Pomerania&obs=pomasteroid1,pomasteroid2,pomasteroid3"
+    }
+  },
+  "version": "50P-1.0",
+  "ruleset": "XWA",
+  "obstacles": [
+    "pomasteroid1",
+    "pomasteroid2",
+    "pomasteroid3"
+  ]
+}
